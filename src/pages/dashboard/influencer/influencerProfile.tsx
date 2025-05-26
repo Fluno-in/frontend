@@ -1,13 +1,20 @@
+
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Camera, Save, User, Mail, Lock, Bell, CreditCard, Shield } from 'lucide-react';
 import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
+import PersonalInfo from '../../../components/profile/PersonalInfo';
+import LinkedAccounts from '../../../components/profile/LinkedAccounts';
+import Security from '../../../components/profile/Security';
+import Notifications from '../../../components/profile/Notifications';
+import Billing from '../../../components/profile/Billing';
+import Privacy from '../../../components/profile/Privacy';
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState('profile');
-  
+
   const tabs = [
     { id: 'profile', label: 'Profile', icon: <User size={16} /> },
     { id: 'security', label: 'Security', icon: <Lock size={16} /> },
@@ -45,7 +52,7 @@ const Profile = () => {
             </div>
             <div>
               <h2 className="text-xl font-semibold text-slate-900">Alex Morgan</h2>
-              <p className="text-slate-600">Business Account · Premium Plan</p>
+              <p className="text-slate-600">Influencer Account · Premium Plan</p>
               <p className="mt-1 text-sm text-slate-500">Member since March 2025</p>
             </div>
           </div>
@@ -75,179 +82,19 @@ const Profile = () => {
       {/* Tab Content */}
       <div className="space-y-6">
         {activeTab === 'profile' && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Card>
-              <h3 className="mb-4 text-lg font-medium text-slate-900">Personal Information</h3>
-              <div className="grid gap-6 md:grid-cols-2">
-                <Input
-                  label="First Name"
-                  id="firstName"
-                  placeholder="Your first name"
-                  defaultValue="Alex"
-                />
-                <Input
-                  label="Last Name"
-                  id="lastName"
-                  placeholder="Your last name"
-                  defaultValue="Morgan"
-                />
-                <Input
-                  label="Email Address"
-                  id="email"
-                  type="email"
-                  placeholder="Your email address"
-                  defaultValue="alex.morgan@example.com"
-                  icon={<Mail size={18} className="text-slate-400" />}
-                />
-                <Input
-                  label="Phone Number"
-                  id="phone"
-                  type="tel"
-                  placeholder="Your phone number"
-                  defaultValue="+1 (555) 123-4567"
-                />
-                <div className="md:col-span-2">
-                  <label htmlFor="bio" className="mb-1.5 block text-sm font-medium text-slate-700">
-                    Bio
-                  </label>
-                  <textarea
-                    id="bio"
-                    rows={3}
-                    className="block w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-slate-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    placeholder="Tell us about yourself or your business"
-                    defaultValue="Local retail business owner specializing in sustainable fashion. Working with influencers to expand our reach in the eco-conscious community."
-                  />
-                </div>
-              </div>
-              <div className="mt-6 flex justify-end">
-                <Button icon={<Save size={16} />}>
-                  Save Changes
-                </Button>
-              </div>
-            </Card>
-
-            <Card className="mt-6">
-              <h3 className="mb-4 text-lg font-medium text-slate-900">Business Information</h3>
-              <div className="grid gap-6 md:grid-cols-2">
-                <Input
-                  label="Business Name"
-                  id="businessName"
-                  placeholder="Your business name"
-                  defaultValue="EcoStyle Boutique"
-                />
-                <Input
-                  label="Business Website"
-                  id="website"
-                  placeholder="Your business website"
-                  defaultValue="https://ecostyle.example.com"
-                />
-                <div className="md:col-span-2">
-                  <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                    Business Category
-                  </label>
-                  <select className="block w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-slate-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500">
-                    <option>Retail</option>
-                    <option>Food & Beverage</option>
-                    <option>Health & Wellness</option>
-                    <option>Beauty & Personal Care</option>
-                    <option>Services</option>
-                    <option>Other</option>
-                  </select>
-                </div>
-                <div className="md:col-span-2">
-                  <label htmlFor="businessDescription" className="mb-1.5 block text-sm font-medium text-slate-700">
-                    Business Description
-                  </label>
-                  <textarea
-                    id="businessDescription"
-                    rows={3}
-                    className="block w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-slate-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    placeholder="Describe your business"
-                    defaultValue="EcoStyle Boutique offers sustainable, eco-friendly fashion for the conscious consumer. We work with local artisans and ethical manufacturers to create stylish, environmentally responsible clothing."
-                  />
-                </div>
-              </div>
-              <div className="mt-6 flex justify-end">
-                <Button icon={<Save size={16} />}>
-                  Save Changes
-                </Button>
-              </div>
-            </Card>
-          </motion.div>
+          <>
+            <PersonalInfo />
+            <LinkedAccounts />
+          </>
         )}
 
-        {activeTab === 'security' && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Card>
-              <h3 className="mb-4 text-lg font-medium text-slate-900">Change Password</h3>
-              <div className="space-y-4">
-                <Input
-                  label="Current Password"
-                  id="currentPassword"
-                  type="password"
-                  placeholder="Enter your current password"
-                />
-                <Input
-                  label="New Password"
-                  id="newPassword"
-                  type="password"
-                  placeholder="Enter your new password"
-                />
-                <Input
-                  label="Confirm New Password"
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="Confirm your new password"
-                />
-              </div>
-              <div className="mt-6 flex justify-end">
-                <Button>
-                  Update Password
-                </Button>
-              </div>
-            </Card>
+        {activeTab === 'security' && <Security />}
 
-            <Card className="mt-6">
-              <h3 className="mb-4 text-lg font-medium text-slate-900">Two-Factor Authentication</h3>
-              <p className="mb-4 text-slate-600">
-                Add an extra layer of security to your account by enabling two-factor authentication.
-              </p>
-              <div className="flex items-center justify-between">
-                <div className="text-sm font-medium text-slate-700">
-                  Two-factor authentication is currently disabled.
-                </div>
-                <Button variant="outline">
-                  Enable 2FA
-                </Button>
-              </div>
-            </Card>
-          </motion.div>
-        )}
+        {activeTab === 'notifications' && <Notifications />}
 
-        {/* Other tabs would go here with their own content */}
-        {activeTab !== 'profile' && activeTab !== 'security' && (
-          <Card>
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="mb-4 rounded-full bg-slate-100 p-4">
-                {tabs.find(tab => tab.id === activeTab)?.icon}
-              </div>
-              <h3 className="mb-2 text-lg font-medium text-slate-900">
-                {tabs.find(tab => tab.id === activeTab)?.label} Settings
-              </h3>
-              <p className="max-w-md text-slate-600">
-                This section is under development. Please check back soon for updates to manage your {tabs.find(tab => tab.id === activeTab)?.label.toLowerCase()} settings.
-              </p>
-            </div>
-          </Card>
-        )}
+        {activeTab === 'billing' && <Billing />}
+
+        {activeTab === 'privacy' && <Privacy />}
       </div>
     </div>
   );
