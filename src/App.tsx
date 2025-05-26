@@ -32,7 +32,7 @@ import BusinessOverview from './pages/dashboard/business/businessOverview';
 import BusinessPostAds from './pages/dashboard/business/PostAds';
 import BusinessApplications from './pages/dashboard/business/Applications';
 import BusinessInfluencers from './pages/dashboard/business/AvailableInfluencers';
-import BusinessProfile from './pages/dashboard/influencer/influencerProfile';
+import BusinessProfile from './pages/dashboard/business/businessProfile';
 import BusinessHelp from './pages/dashboard/shared/HelpAndSupport'
 ;
 
