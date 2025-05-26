@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { HelpCircle, Book, MessageSquare, Play, FileText } from 'lucide-react';
-import Card from '../ui/Card';
-import Button from '../ui/Button';
+import Card from '../../../components/ui/Card';
+import Button from '../../../components/ui/Button';
 
 const HelpAndSupport = () => {
   const helpCategories = [

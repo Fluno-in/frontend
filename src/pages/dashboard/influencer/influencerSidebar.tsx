@@ -9,7 +9,11 @@ import {
   HelpCircle,
   ChevronLeft,
   Menu,
-  LogOut
+  LogOut,
+  FileText,
+  ClipboardList,
+  User,
+  MessageCircle
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -24,11 +28,11 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
   const toggleMobileSidebar = () => setIsMobileOpen(!isMobileOpen);
 
   const sidebarItems = [
-    { icon: <Home size={20} />, label: 'Dashboard', path: '/dashboard' },
-    { icon: <BarChart2 size={20} />, label: 'Campaigns', path: '/campaigns' },
-    { icon: <Users size={20} />, label: 'Connections', path: '/connections' },
-    { icon: <Settings size={20} />, label: 'Settings', path: '/settings' },
-    { icon: <HelpCircle size={20} />, label: 'Help & Support', path: '/help' },
+    { icon: <Home size={20} />, label: 'Overview', path: '/dashboard/influencer/overview' },
+    { icon: <ClipboardList size={20} />, label: 'Available Ads', path: '/dashboard/influencer/ads' },
+    { icon: <FileText size={20} />, label: 'Requests', path: '/dashboard/influencer/requests' },
+    { icon: <User size={20} />, label: 'Profile', path: '/dashboard/influencer/profile' },
+    { icon: <HelpCircle size={20} />, label: 'Help', path: '/dashboard/influencer/help' },
   ];
 
   const sidebarVariants = {

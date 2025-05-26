@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { BarChart, TrendingUp, Users, Calendar } from 'lucide-react';
-import Card from '../ui/Card';
+import Card from '../../../components/ui/Card';
 
 const Overview = () => {
   const stats = [
