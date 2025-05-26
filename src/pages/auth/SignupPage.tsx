@@ -20,6 +20,7 @@ const SignupPage = () => {
   
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [successMessage, setSuccessMessage] = useState('');
+  const [loading, setLoading] = useState(false);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -64,6 +65,7 @@ const SignupPage = () => {
     setSuccessMessage('');
     
     if (Object.keys(formErrors).length === 0) {
+      setLoading(true);
       try {
         const userData = {
           name: formData.firstName + ' ' + formData.lastName,
@@ -86,6 +88,8 @@ const SignupPage = () => {
         } else {
           setErrors({ apiError: error.message || 'Failed to signup' });
         }
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -239,7 +243,7 @@ const SignupPage = () => {
                   </div>
                 )}
                 
-                <Button type="submit" fullWidth icon={<ArrowRight size={18} />} iconPosition="right">
+                <Button type="submit" fullWidth icon={<ArrowRight size={18} />} iconPosition="right" loading={loading}>
                   Create Account
                 </Button>
               </form>
