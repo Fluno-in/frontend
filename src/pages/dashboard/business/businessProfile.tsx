@@ -9,6 +9,7 @@ import Notifications from '../../../components/profile/Notifications';
 import Billing from '../../../components/profile/Billing';
 import Privacy from '../../../components/profile/Privacy';
 import BusinessInfo from '../../../components/profile/BusinessInfo';
+import LinkedAccounts from '../../../components/profile/LinkedAccounts';
 
 const BusinessProfile = () => {
   const [activeTab, setActiveTab] = useState('profile');
@@ -79,7 +80,12 @@ const BusinessProfile = () => {
 
       {/* Tab Content */}
       <div className="space-y-6">
-        {activeTab === 'profile' && <BusinessInfo />}
+        {activeTab === 'profile' && (
+          <>
+            <BusinessInfo />
+            <LinkedAccounts />
+          </>
+        )}
 
         {activeTab === 'security' && <Security />}
 
