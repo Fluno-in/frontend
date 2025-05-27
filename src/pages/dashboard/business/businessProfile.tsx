@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Camera, Save, User, Mail, Lock, Bell, CreditCard, Shield } from 'lucide-react';
 import Card from '../../../components/ui/Card';
@@ -10,9 +10,12 @@ import Billing from '../../../components/profile/Billing';
 import Privacy from '../../../components/profile/Privacy';
 import BusinessInfo from '../../../components/profile/BusinessInfo';
 import LinkedAccounts from '../../../components/profile/LinkedAccounts';
+import { getBusinessInfo, upsertBusinessInfo } from '../../../services/businessDashboard/businessInfo';
 
 const BusinessProfile = () => {
   const [activeTab, setActiveTab] = useState('profile');
+  const [businessInfoData, setBusinessInfoData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: <User size={16} /> },
@@ -21,6 +24,33 @@ const BusinessProfile = () => {
     { id: 'billing', label: 'Billing', icon: <CreditCard size={16} /> },
     { id: 'privacy', label: 'Privacy', icon: <Shield size={16} /> },
   ];
+
+  useEffect(() => {
+    const fetchBusinessInfo = async () => {
+      setLoading(true);
+      try {
+        const data = await getBusinessInfo();
+        setBusinessInfoData(data);
+      } catch (error) {
+        console.error('Failed to fetch business info:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBusinessInfo();
+  }, []);
+
+  const handleSave = async (updatedData) => {
+    setLoading(true);
+    try {
+      const savedData = await upsertBusinessInfo(updatedData);
+      setBusinessInfoData(savedData);
+    } catch (error) {
+      console.error('Failed to save business info:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -50,7 +80,7 @@ const BusinessProfile = () => {
               </button>
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-slate-900">EcoStyle Boutique</h2>
+              <h2 className="text-xl font-semibold text-slate-900">{businessInfoData?.businessName || 'EcoStyle Boutique'}</h2>
               <p className="text-slate-600">Business Account · Premium Plan</p>
               <p className="mt-1 text-sm text-slate-500">Member since March 2025</p>
             </div>
@@ -82,7 +112,7 @@ const BusinessProfile = () => {
       <div className="space-y-6">
         {activeTab === 'profile' && (
           <>
-            <BusinessInfo />
+            <BusinessInfo data={businessInfoData} onSave={handleSave} loading={loading} />
             <LinkedAccounts />
           </>
         )}

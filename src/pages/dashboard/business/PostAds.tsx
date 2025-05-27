@@ -1,174 +1,192 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { X } from 'lucide-react';
-import Card from '../../../components/ui/Card';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, MessageSquare } from 'lucide-react';
 import Button from '../../../components/ui/Button';
-import Input from '../../../components/ui/Input';
+import { postAd, getAds, deleteAd } from '../../../services/businessDashboard/postAds';
+import CreateCampaignCard from '../../../components/Advertisement/CreateCampaignCard';
+import AdCard from '../../../components/Advertisement/AdCard';
 
 const PostAds = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [showToast, setShowToast] = useState(false);
   const [formData, setFormData] = useState({
     campaignName: '',
     platforms: [] as string[],
     startDate: '',
     endDate: '',
     taskCount: '',
-    barterOrPaid: 'barter',
+    barterOrPaid: 'barter' as 'barter' | 'paid',
     budget: '',
     requirements: '',
+    campaignDescription: '',
+    image: null as File | null,
   });
-
-  const platformsOptions = ['Instagram', 'Facebook', 'TikTok', 'YouTube'];
+  const [ads, setAds] = useState<any[]>([]);
 
   const togglePopup = () => setIsPopupOpen(!isPopupOpen);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const target = e.target as HTMLInputElement;
-    const { name, value, checked } = target;
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value, checked, files } = e.target as HTMLInputElement;
+
     if (name === 'platforms') {
-      let newPlatforms = [...formData.platforms];
-      if (checked) {
-        newPlatforms.push(value);
-      } else {
-        newPlatforms = newPlatforms.filter((p) => p !== value);
-      }
-      setFormData({ ...formData, platforms: newPlatforms });
+      const updatedPlatforms = checked
+        ? [...formData.platforms, value]
+        : formData.platforms.filter((p) => p !== value);
+      setFormData({ ...formData, platforms: updatedPlatforms });
+    } else if (name === 'image' && files) {
+      setFormData({ ...formData, image: files[0] });
     } else {
       setFormData({ ...formData, [name]: value });
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: handle form submission logic
-    togglePopup();
+  const fetchAds = async () => {
+    try {
+      const data = await getAds();
+      if (Array.isArray(data)) {
+        setAds(data);
+      } else {
+        setAds([]);
+        console.error('Expected ads data to be an array but got:', data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch ads:', error);
+      setAds([]);
+    }
   };
+
+  const handleDeleteAd = async (id: string) => {
+    try {
+      await deleteAd(id);
+      setDeleteToast(true);
+      setTimeout(() => setDeleteToast(false), 3000);
+      fetchAds();
+    } catch (error) {
+      console.error('Failed to delete ad:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAds();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      // @ts-ignore
+      await postAd(formData);
+      togglePopup();
+      setFormData({
+        campaignName: '',
+        platforms: [],
+        startDate: '',
+        endDate: '',
+        taskCount: '',
+        barterOrPaid: 'barter',
+        budget: '',
+        requirements: '',
+        campaignDescription: '',
+        image: null,
+      });
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+      fetchAds();
+    } catch (error) {
+      console.error('Failed to post ad:', error);
+    }
+  };
+
+  const [deleteToast, setDeleteToast] = useState(false);
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900">Post New Ad</h1>
-        <Button onClick={togglePopup}>Create Campaign</Button>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Campaign Management</h1>
+          <p className="text-slate-600 mt-1">Create and manage your influencer marketing campaigns</p>
+        </div>
+        <Button
+          onClick={togglePopup}
+          icon={<Plus size={18} />}
+          className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
+        >
+          Create Campaign
+        </Button>
       </div>
 
-      {/* Popup Form */}
-      {isPopupOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-        >
-          <Card className="w-full max-w-lg p-6 relative">
-            <button
-              onClick={togglePopup}
-              className="absolute right-4 top-4 rounded-full p-2 text-slate-600 hover:bg-slate-100"
+      <AnimatePresence>
+        {isPopupOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: 'spring', duration: 0.3 }}
             >
-              <X size={20} />
-            </button>
-            <h2 className="mb-4 text-xl font-semibold text-slate-900">Create New Campaign</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <Input
-                label="Campaign Name"
-                name="campaignName"
-                value={formData.campaignName}
-                onChange={handleInputChange}
-                required
+              <CreateCampaignCard
+                formData={formData}
+                handleInputChange={handleInputChange}
+                handleSubmit={handleSubmit}
+                togglePopup={togglePopup}
               />
-              <fieldset>
-                <legend className="mb-2 font-medium text-slate-700">Platform(s)</legend>
-                <div className="flex flex-wrap gap-3">
-                  {platformsOptions.map((platform) => (
-                    <label key={platform} className="inline-flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        name="platforms"
-                        value={platform}
-                        checked={formData.platforms.includes(platform)}
-                        onChange={handleInputChange}
-                      />
-                      <span>{platform}</span>
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
-              <div className="flex space-x-4">
-                <Input
-                  label="Start Date"
-                  name="startDate"
-                  type="date"
-                  value={formData.startDate}
-                  onChange={handleInputChange}
-                  required
-                />
-                <Input
-                  label="End Date"
-                  name="endDate"
-                  type="date"
-                  value={formData.endDate}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <Input
-                label="Task (No. of posts/stories)"
-                name="taskCount"
-                type="number"
-                value={formData.taskCount}
-                onChange={handleInputChange}
-                required
-              />
-              <fieldset>
-                <legend className="mb-2 font-medium text-slate-700">Barter or Paid</legend>
-                <label className="inline-flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    name="barterOrPaid"
-                    value="barter"
-                    checked={formData.barterOrPaid === 'barter'}
-                    onChange={handleInputChange}
-                  />
-                  <span>Barter</span>
-                </label>
-                <label className="inline-flex items-center space-x-2 ml-6">
-                  <input
-                    type="radio"
-                    name="barterOrPaid"
-                    value="paid"
-                    checked={formData.barterOrPaid === 'paid'}
-                    onChange={handleInputChange}
-                  />
-                  <span>Paid</span>
-                </label>
-              </fieldset>
-              {formData.barterOrPaid === 'paid' && (
-                <Input
-                  label="Budget"
-                  name="budget"
-                  type="number"
-                  value={formData.budget}
-                  onChange={handleInputChange}
-                  required
-                />
-              )}
-              <Input
-                label="Requirements (followers, niche)"
-                name="requirements"
-                value={formData.requirements}
-                onChange={handleInputChange}
-              />
-              <div className="flex justify-end">
-                <Button type="submit" variant="primary">
-                  Submit
-                </Button>
-                <Button type="button" variant="outline" onClick={togglePopup} className="ml-2">
-                  Cancel
-                </Button>
-              </div>
-            </form>
-          </Card>
-        </motion.div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {ads.length === 0 ? (
+          <div className="col-span-full text-center py-12">
+            <div className="mb-4 text-slate-400">
+              <MessageSquare size={48} className="mx-auto" />
+            </div>
+            <h3 className="text-lg font-medium text-slate-900">No campaigns yet</h3>
+            <p className="text-slate-600 mt-1">Create your first campaign to get started</p>
+          </div>
+        ) : (
+          ads.map((ad: any) => (
+            <motion.div
+              key={ad._id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <AdCard ad={ad} onDelete={handleDeleteAd} />
+            </motion.div>
+          ))
+        )}
+      </div>
+
+      <AnimatePresence>
+        {showToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-4 right-4 bg-green-100 text-green-800 px-6 py-3 rounded-lg shadow-lg"
+          >
+            Campaign created successfully!
+          </motion.div>
+        )}
+
+        {deleteToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-4 right-4 bg-red-100 text-red-800 px-6 py-3 rounded-lg shadow-lg"
+          >
+            Campaign deleted successfully!
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

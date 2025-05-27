@@ -1,13 +1,13 @@
 import { Routes, Route } from 'react-router-dom';
 import MainLayout from './components/layout/MainLayout';
 import AuthLayout from './components/layout/AuthLayout';
-import Home from './pages/Home';
-import AboutPage from './pages/AboutPage';
-import ContactPage from './pages/ContactPage';
-import FeaturesPage from './pages/FeaturesPage';
-import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
-import TermsPage from './pages/TermsPage';
-import CookiePolicyPage from './pages/CookiePolicyPage';
+import Home from './pages/landing/Home';
+import AboutPage from './pages/landing/AboutPage';
+import ContactPage from './pages/landing/ContactPage';
+import FeaturesPage from './pages/landing/FeaturesPage';
+import PrivacyPolicyPage from './pages/landing/PrivacyPolicyPage';
+import TermsPage from './pages/landing/TermsPage';
+import CookiePolicyPage from './pages/landing/CookiePolicyPage';
 import LoginPage from './pages/auth/LoginPage';
 import SignupPage from './pages/auth/SignupPage';
 import VerifyEmailPage from './pages/auth/VerifyEmailPage';
@@ -15,8 +15,7 @@ import VerifyOtp from './pages/auth/VerifyOtp';
 import BusinessOnboarding from './pages/onboarding/BusinessOnboarding';
 import InfluencerOnboarding from './pages/onboarding/InfluencerOnboarding';
 import LinkSocials from './pages/onboarding/LinkSocials';
-import InfluencerDashboard from './pages/InfluencerDashboard';
-import BusinessDashboard from './pages/BusinessDashboard';
+
 
 // Influencer Dashboard
 import InfluencerDashboardLayout from './components/layout/InfluencerDashboardLayout';
@@ -57,8 +56,6 @@ function App() {
         <Route path="onboarding/business" element={<BusinessOnboarding />} />
         <Route path="onboarding/influencer" element={<InfluencerOnboarding />} />
         <Route path="onboarding/linksocials" element={<LinkSocials />} />
-        <Route path="dashboard/influencer" element={<InfluencerDashboard />} />
-        <Route path="dashboard/business" element={<BusinessDashboard />} />
       </Route>
 
        {/* Influencer Dashboard Routes */}

@@ -2,7 +2,10 @@ import axios from 'axios';
 import { getToken } from '../utils/auth';
 
 // Base URL for onboarding API
-const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api/onboarding` || 'http://localhost:5000/api/onboarding';
+
+
+const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const BASE_URL = `${baseUrl}/api/onboarding`;
 
 // Helper to get auth headers
 const getAuthHeaders = () => {

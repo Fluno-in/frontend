@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Camera, Save, User, Mail, Lock, Bell, CreditCard, Shield } from 'lucide-react';
 import Card from '../../../components/ui/Card';
@@ -11,9 +10,12 @@ import Security from '../../../components/profile/Security';
 import Notifications from '../../../components/profile/Notifications';
 import Billing from '../../../components/profile/Billing';
 import Privacy from '../../../components/profile/Privacy';
+import { getPersonalInfo, upsertPersonalInfo } from '../../../services/influencerDashboard/personalInfo';
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState('profile');
+  const [personalInfoData, setPersonalInfoData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: <User size={16} /> },
@@ -22,6 +24,33 @@ const Profile = () => {
     { id: 'billing', label: 'Billing', icon: <CreditCard size={16} /> },
     { id: 'privacy', label: 'Privacy', icon: <Shield size={16} /> },
   ];
+
+  useEffect(() => {
+    const fetchPersonalInfo = async () => {
+      setLoading(true);
+      try {
+        const data = await getPersonalInfo();
+        setPersonalInfoData(data);
+      } catch (error) {
+        console.error('Failed to fetch personal info:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPersonalInfo();
+  }, []);
+
+  const handleSave = async (updatedData) => {
+    setLoading(true);
+    try {
+      const savedData = await upsertPersonalInfo(updatedData);
+      setPersonalInfoData(savedData);
+    } catch (error) {
+      console.error('Failed to save personal info:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -51,7 +80,7 @@ const Profile = () => {
               </button>
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-slate-900">Alex Morgan</h2>
+              <h2 className="text-xl font-semibold text-slate-900">{personalInfoData?.fullName || 'Alex Morgan'}</h2>
               <p className="text-slate-600">Influencer Account · Premium Plan</p>
               <p className="mt-1 text-sm text-slate-500">Member since March 2025</p>
             </div>
@@ -83,7 +112,7 @@ const Profile = () => {
       <div className="space-y-6">
         {activeTab === 'profile' && (
           <>
-            <PersonalInfo />
+            <PersonalInfo data={personalInfoData} onSave={handleSave} loading={loading} />
             <LinkedAccounts />
           </>
         )}

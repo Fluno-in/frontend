@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { CheckCircle, Globe, BarChart2, Users, Calendar, Zap, ShieldCheck, MessageSquare } from 'lucide-react';
-import Container from '../components/ui/Container';
-import Button from '../components/ui/Button';
+import Container from '../../components/ui/Container';
+import Button from '../../components/ui/Button';
 
 const FeatureSection = ({ title, description, features, image, reversed = false }: { 
   title: string;

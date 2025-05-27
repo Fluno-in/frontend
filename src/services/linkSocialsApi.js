@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { getToken } from '../utils/auth';
 
-const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/api/linkSocials/status`||'http://localhost:5000/api/linkSocials/status';
+const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const API_BASE = `${baseUrl}/api/linkSocials/status`;
 
 export const fetchLinkedSocials = async () => {
   const token = getToken();
