@@ -89,14 +89,7 @@ const AvailableInfluencerModal = ({
               {modalView === 'options' && (
                 <div className="space-y-4">
                   <Button
-<<<<<<< HEAD
-                    onClick={() => {
-                      console.log('Choose from Posted Ads button clicked');
-                      setModalView('postedAds');
-                    }}
-=======
                     onClick={() => setModalView('postedAds')}
->>>>>>> 7babb1b (Available Influencer done and tested)
                     variant="outline"
                     className="w-full py-3"
                   >

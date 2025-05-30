@@ -23,11 +23,7 @@ interface Influencer {
     insights: any[];
   } | null;
   personalInfo?: {
-<<<<<<< HEAD
-    name: string;
-=======
     fullName: string;
->>>>>>> 7babb1b (Available Influencer done and tested)
     gender: string;
     city: string;
     state: string;
@@ -104,10 +100,6 @@ const AvailableInfluencers = () => {
   }, []);
 
   useEffect(() => {
-<<<<<<< HEAD
-    console.log('useEffect triggered with modalView:', modalView, 'selectedInfluencerId:', selectedInfluencerId);
-=======
->>>>>>> 7babb1b (Available Influencer done and tested)
     if (modalView === 'postedAds' && selectedInfluencerId) {
       fetchAds();
     }
@@ -156,10 +148,6 @@ const AvailableInfluencers = () => {
     }
   };
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 7babb1b (Available Influencer done and tested)
   // Handlers
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -252,9 +240,7 @@ const AvailableInfluencers = () => {
   const filteredInfluencers = influencers.filter(influencer => {
 <<<<<<< HEAD
     const name = influencer.personalInfo?.name || '';
-=======
     const name = influencer.personalInfo?.fullName || '';
->>>>>>> 7babb1b (Available Influencer done and tested)
     const location = `${influencer.personalInfo?.city || ''} ${influencer.personalInfo?.state || ''}`.trim();
     const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       location.toLowerCase().includes(searchTerm.toLowerCase());
@@ -326,15 +312,9 @@ filteredInfluencers.map((influencer) => (
           profileImageUrl={
             influencer.instagramInsights?.profile_picture_url || ''
           }
-<<<<<<< HEAD
-        fullName={
-          influencer.personalInfo?.name || ''
-        }
-=======
           fullName={
             influencer.personalInfo?.fullName || ''
           }
->>>>>>> 7babb1b (Available Influencer done and tested)
           city={influencer.personalInfo?.city || ''}
           state={influencer.personalInfo?.state || ''}
           followers={
