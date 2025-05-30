@@ -238,8 +238,6 @@ const AvailableInfluencers = () => {
 
   // Filter Functions
   const filteredInfluencers = influencers.filter(influencer => {
-<<<<<<< HEAD
-    const name = influencer.personalInfo?.name || '';
     const name = influencer.personalInfo?.fullName || '';
     const location = `${influencer.personalInfo?.city || ''} ${influencer.personalInfo?.state || ''}`.trim();
     const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) ||
