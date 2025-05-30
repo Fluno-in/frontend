@@ -6,8 +6,7 @@ import Container from '../../components/ui/Container';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { login } from '../../services/authServices/signupLoginApi';
-import { setToken } from '../../utils/auth';
-import { getCurrentUser } from '../../services/authServices/authApi';
+import { useAuth } from '../../context/AuthContext';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -16,7 +15,9 @@ const LoginPage = () => {
   const [apiError, setApiError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
+  const { login: contextLogin } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +45,7 @@ const LoginPage = () => {
       try {
         const data = await login({ email, password });
         try {
-          setToken(data.token);
+          contextLogin(data.token, { _id: data._id, name: data.name, email: data.email, type: data.type }, rememberMe);
         } catch (tokenError) {
           console.error('Failed to set token:', tokenError);
           setApiError('Failed to save authentication token.');
@@ -53,28 +54,17 @@ const LoginPage = () => {
         }
         setSuccessMessage('Login successful! Redirecting...');
         setLoading(false);
-        try {
-          // After setting token, fetch current user info
-          const currentUser = await getCurrentUser();
-          setTimeout(() => {
-            // Use redirectRoute from login response if available
-            if (data.redirectRoute) {
-              navigate(data.redirectRoute);
-            } else if (currentUser.type === 'influencer') {
-              navigate('/dashboard/influencer');
-            } else if (currentUser.type === 'business') {
-              navigate('/dashboard/business');
-            } else {
-              navigate('/');
-            }
-          }, 2000);
-        } catch (userError) {
-          console.error('Failed to fetch current user after login:', userError);
-          // fallback navigation
-          setTimeout(() => {
+        setTimeout(() => {
+          if (data.redirectRoute) {
+            navigate(data.redirectRoute);
+          } else if (data.type === 'influencer') {
+            navigate('/dashboard/influencer');
+          } else if (data.type === 'business') {
+            navigate('/dashboard/business');
+          } else {
             navigate('/');
-          }, 2000);
-        }
+          }
+        }, 2000);
       } catch (error: any) {
         setLoading(false);
         if (error.message === 'Email not verified') {
@@ -152,6 +142,8 @@ const LoginPage = () => {
                       name="remember-me"
                       type="checkbox"
                       className="h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
                     />
                     <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-700">
                       Remember me

@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate  } from 'react-router-dom';
 import MainLayout from './components/layout/MainLayout';
 import AuthLayout from './components/layout/AuthLayout';
 import Home from './pages/landing/Home';
@@ -16,14 +16,13 @@ import BusinessOnboarding from './pages/onboarding/BusinessOnboarding';
 import InfluencerOnboarding from './pages/onboarding/InfluencerOnboarding';
 import LinkSocials from './pages/onboarding/LinkSocials';
 
-
 // Influencer Dashboard
 import InfluencerDashboardLayout from './components/layout/InfluencerDashboardLayout';
 import InfluencerOverview from './pages/dashboard/influencer/influencerOverview';
 import InfluencerAds from './pages/dashboard/influencer/Ads';
 import InfluencerRequests from './pages/dashboard/influencer/Requests';
-import InfluencerProfile from './pages/dashboard/influencer/influencerProfile';;
-import InfluencerHelp from './pages/dashboard/shared/HelpAndSupport'
+import InfluencerProfile from './pages/dashboard/influencer/influencerProfile';
+import InfluencerHelp from './pages/dashboard/shared/HelpAndSupport';
 
 // Business Dashboard
 import BusinessDashboardLayout from './components/layout/BusinessDashboardLayout';
@@ -32,11 +31,32 @@ import BusinessPostAds from './pages/dashboard/business/PostAds';
 import BusinessApplications from './pages/dashboard/business/Applications';
 import BusinessInfluencers from './pages/dashboard/business/AvailableInfluencers';
 import BusinessProfile from './pages/dashboard/business/businessProfile';
-import BusinessHelp from './pages/dashboard/shared/HelpAndSupport'
-;
+import BusinessHelp from './pages/dashboard/shared/HelpAndSupport';
 
+import { AuthProvider, useAuth } from './context/AuthContext';
+import ProtectedRoute from './utils/ProtectedRoute';
 
-function App() {
+function AppContent() {
+  const { loading, user } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="loader">Loading...</div>
+      </div>
+    );
+  }
+
+  if (user) {
+    if (window.location.pathname === '/') {
+      if (user.type === 'influencer') {
+        return <Navigate to="/dashboard/influencer" replace />;
+      } else if (user.type === 'business') {
+        return <Navigate to="/dashboard/business" replace />;
+      }
+    }
+  }
+
   return (
     <Routes>
       <Route path="/" element={<MainLayout />}>
@@ -59,26 +79,38 @@ function App() {
       </Route>
 
        {/* Influencer Dashboard Routes */}
-      <Route path="dashboard/influencer" element={<InfluencerDashboardLayout />}>
-        <Route index element={<InfluencerOverview />} />
-        <Route path='overview' element={< InfluencerOverview />} />
-        <Route path="ads" element={<InfluencerAds />} />
-        <Route path="requests" element={<InfluencerRequests />} />
-        <Route path="profile" element={<InfluencerProfile />} />
-        <Route path="help" element={<InfluencerHelp />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="dashboard/influencer" element={<InfluencerDashboardLayout />}>
+          <Route index element={<InfluencerOverview />} />
+          <Route path='overview' element={< InfluencerOverview />} />
+          <Route path="ads" element={<InfluencerAds />} />
+          <Route path="requests" element={<InfluencerRequests />} />
+          <Route path="profile" element={<InfluencerProfile />} />
+          <Route path="help" element={<InfluencerHelp />} />
+        </Route>
       </Route>
 
       {/* Business Dashboard Routes */}
-      <Route path="dashboard/business" element={<BusinessDashboardLayout />}>
-        <Route index element={<BusinessOverview />} />
-        <Route path='overview' element={< BusinessOverview/>} />
-        <Route path="post-ads" element={<BusinessPostAds />} />
-        <Route path="applications" element={<BusinessApplications />} />
-        <Route path="influencers" element={<BusinessInfluencers />} />
-        <Route path="profile" element={<BusinessProfile />} />
-        <Route path="help" element={<BusinessHelp />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="dashboard/business" element={<BusinessDashboardLayout />}>
+          <Route index element={<BusinessOverview />} />
+          <Route path='overview' element={< BusinessOverview/>} />
+          <Route path="post-ads" element={<BusinessPostAds />} />
+          <Route path="applications" element={<BusinessApplications />} />
+          <Route path="influencers" element={<BusinessInfluencers />} />
+          <Route path="profile" element={<BusinessProfile />} />
+          <Route path="help" element={<BusinessHelp />} />
+        </Route>
       </Route>
     </Routes>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

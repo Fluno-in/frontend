@@ -1,17 +1,10 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Home,
-  FileText,
-  ClipboardList,
-  Users,
-  HelpCircle,
-  User,
-  LogOut,
-  ChevronLeft,
-  Menu
+import {
+  Home, FileText, ClipboardList, Users, HelpCircle, User, LogOut, ChevronLeft, Menu
 } from 'lucide-react';
+import { useAuth } from '../../../context/AuthContext'; // ✅ Update the path as needed
 
 interface SidebarProps {
   children?: React.ReactNode;
@@ -20,6 +13,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ children }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const { logout } = useAuth(); // ✅ Access logout function
 
   const toggleSidebar = () => setIsOpen(!isOpen);
   const toggleMobileSidebar = () => setIsMobileOpen(!isMobileOpen);
@@ -50,7 +44,7 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Mobile sidebar backdrop */}
+      {/* Mobile Backdrop */}
       <AnimatePresence>
         {isMobileOpen && (
           <motion.div
@@ -64,7 +58,7 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
         )}
       </AnimatePresence>
 
-      {/* Mobile sidebar toggle button */}
+      {/* Mobile Toggle Button */}
       <button
         onClick={toggleMobileSidebar}
         className="fixed left-4 top-4 z-30 rounded-lg bg-white p-2 shadow-md lg:hidden"
@@ -82,10 +76,7 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
         <div className="flex h-full flex-col">
           <div className="flex h-16 items-center justify-between px-4 border-b">
             <span className="text-xl font-semibold text-primary-700">Suzao</span>
-            <button
-              onClick={toggleMobileSidebar}
-              className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
-            >
+            <button onClick={toggleMobileSidebar} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100">
               <ChevronLeft size={20} />
             </button>
           </div>
@@ -97,9 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
                 to={item.path}
                 className={({ isActive }) =>
                   `flex items-center space-x-3 rounded-lg px-3 py-2 ${
-                    isActive
-                      ? 'bg-primary-50 text-primary-700'
-                      : 'text-slate-700 hover:bg-slate-100'
+                    isActive ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-100'
                   }`
                 }
               >
@@ -110,7 +99,10 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
           </nav>
 
           <div className="border-t p-4">
-            <button className="flex w-full items-center space-x-3 rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-100">
+            <button
+              onClick={logout}
+              className="flex w-full items-center space-x-3 rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-100"
+            >
               <LogOut size={20} />
               <span>Logout</span>
             </button>
@@ -127,11 +119,7 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
       >
         <div className="flex h-full flex-col">
           <div className="flex h-16 items-center justify-between px-4 border-b">
-            {isOpen ? (
-              <span className="text-xl font-semibold text-primary-700">Suzao</span>
-            ) : (
-              <span className="mx-auto text-xl font-semibold text-primary-700">S</span>
-            )}
+            <span className="text-xl font-semibold text-primary-700">{isOpen ? 'Suzao' : 'S'}</span>
             <button
               onClick={toggleSidebar}
               className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
@@ -147,9 +135,7 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
                 to={item.path}
                 className={({ isActive }) =>
                   `flex items-center ${isOpen ? 'space-x-3' : 'justify-center'} rounded-lg px-3 py-2 ${
-                    isActive
-                      ? 'bg-primary-50 text-primary-700'
-                      : 'text-slate-700 hover:bg-slate-100'
+                    isActive ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-100'
                   }`
                 }
               >
@@ -160,7 +146,10 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
           </nav>
 
           <div className="border-t p-4">
-            <button className={`flex ${isOpen ? 'w-full items-center space-x-3' : 'justify-center w-full'} rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-100`}>
+            <button
+              onClick={logout}
+              className={`flex ${isOpen ? 'w-full items-center space-x-3' : 'justify-center w-full'} rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-100`}
+            >
               <LogOut size={20} />
               {isOpen && <span>Logout</span>}
             </button>
