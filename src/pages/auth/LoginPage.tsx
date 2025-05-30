@@ -57,7 +57,10 @@ const LoginPage = () => {
           // After setting token, fetch current user info
           const currentUser = await getCurrentUser();
           setTimeout(() => {
-            if (currentUser.type === 'influencer') {
+            // Use redirectRoute from login response if available
+            if (data.redirectRoute) {
+              navigate(data.redirectRoute);
+            } else if (currentUser.type === 'influencer') {
               navigate('/dashboard/influencer');
             } else if (currentUser.type === 'business') {
               navigate('/dashboard/business');
