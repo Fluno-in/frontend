@@ -5,7 +5,7 @@ import { Mail, User, Lock, ArrowRight } from 'lucide-react';
 import Container from '../../components/ui/Container';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import { signup } from '../../services/signupLoginApi';
+import { signup } from '../../services/authServices/signupLoginApi';
 
 const SignupPage = () => {
   const navigate = useNavigate();

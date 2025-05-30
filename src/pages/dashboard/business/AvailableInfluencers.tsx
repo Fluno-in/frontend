@@ -1,221 +1,364 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { UserPlus, X } from 'lucide-react';
-import Card from '../../../components/ui/Card';
-import Button from '../../../components/ui/Button';
-import Input from '../../../components/ui/Input';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { UserPlus, Search, Filter } from 'lucide-react';
+
+// Components
+import InfluencerProfileCard from '../../../components/Influencer/InfluencerProfileCard';
+
+// Services
+import { getAds } from '../../../services/businessDashboard/postAds';
+import { getAvailableInfluencers } from '../../../services/businessDashboard/availableInfluencers';
+import { sendRequestToInfluencer } from '../../../services/businessDashboard/requestAds';
+import AvailableInfluencerModal from '../../../components/dashboard/AvailableInfluencerModal';
+
+
+interface Influencer {
+  _id: string;
+  user?: string;
+  instagramInsights?: {
+    followers_count: number;
+    media_count: number;
+    username: string;
+    profile_picture_url: string;
+    insights: any[];
+  } | null;
+  personalInfo?: {
+    name: string;
+    gender: string;
+    city: string;
+    state: string;
+    niche?: string;
+  };
+}
+
+interface FormData {
+  campaignName: string;
+  platforms: string[];
+  startDate: string;
+  endDate: string;
+  taskCount: string;
+  barterOrPaid: 'barter' | 'paid';
+  budget: string;
+  requirements: string;
+  campaignDescription: string;
+  image: File | null;
+}
 
 const AvailableInfluencers = () => {
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [formData, setFormData] = useState({
+  // State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalView, setModalView] = useState<'options' | 'postedAds' | 'createCampaign'>('options');
+  const [ads, setAds] = useState<any[]>([]);
+  const [influencers, setInfluencers] = useState<Influencer[]>([]);
+  const [selectedInfluencerId, setSelectedInfluencerId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedNiche, setSelectedNiche] = useState<string>('all');
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [toastMessage, setToastMessage] = useState('');
+  const [showToast, setShowToast] = useState(false);
+
+  const [formData, setFormData] = useState<FormData>({
     campaignName: '',
-    platforms: [] as string[],
+    platforms: [],
     startDate: '',
     endDate: '',
     taskCount: '',
     barterOrPaid: 'barter',
     budget: '',
     requirements: '',
+    campaignDescription: '',
+    image: null,
   });
 
-  const influencers = [
-    {
-      id: 1,
-      name: 'Sarah Wilson',
-      location: 'New York, USA',
-      followers: '120K',
-      niche: 'Fashion',
-      image: 'https://images.pexels.com/photos/5709661/pexels-photo-5709661.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    },
-    {
-      id: 2,
-      name: 'Michael Chen',
-      location: 'Los Angeles, USA',
-      followers: '85K',
-      niche: 'Health & Wellness',
-      image: 'https://images.pexels.com/photos/3323682/pexels-photo-3323682.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    },
-    {
-      id: 3,
-      name: 'Emma Johnson',
-      location: 'Chicago, USA',
-      followers: '150K',
-      niche: 'Tech',
-      image: 'https://images.pexels.com/photos/1029757/pexels-photo-1029757.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    },
-  ];
-
-  const togglePopup = () => setIsPopupOpen(!isPopupOpen);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const target = e.target as HTMLInputElement;
-    const { name, value, checked } = target;
-    if (name === 'platforms') {
-      let newPlatforms = [...formData.platforms];
-      if (checked) {
-        newPlatforms.push(value);
-      } else {
-        newPlatforms = newPlatforms.filter((p) => p !== value);
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
       }
-      setFormData({ ...formData, platforms: newPlatforms });
-    } else {
-      setFormData({ ...formData, [name]: value });
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: handle form submission logic
-    togglePopup();
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100
+      }
+    }
   };
 
+  // Effects
+  useEffect(() => {
+    fetchInfluencers();
+  }, []);
+
+  useEffect(() => {
+    console.log('useEffect triggered with modalView:', modalView, 'selectedInfluencerId:', selectedInfluencerId);
+    if (modalView === 'postedAds' && selectedInfluencerId) {
+      fetchAds();
+    }
+  }, [modalView, selectedInfluencerId]);
+
+  // Fetch Functions
+  const fetchInfluencers = async () => {
+    setIsLoading(true);
+    try {
+      const data = await getAvailableInfluencers();
+      if (Array.isArray(data)) {
+        // Map backend data to frontend structure
+        const mappedInfluencers = data.map((influencer: any) => ({
+          ...influencer,
+          personalInfo: {
+            ...influencer.personalInfo,
+            fullName: influencer.personalInfo?.name || '',
+          },
+        }));
+        setInfluencers(mappedInfluencers);
+      } else {
+        console.error('Expected influencers data to be an array but got:', data);
+        setInfluencers([]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch influencers:', error);
+      setInfluencers([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchAds = async () => {
+    console.log('fetchAds called with selectedInfluencerId:', selectedInfluencerId);
+    if (!selectedInfluencerId) {
+      console.log('selectedInfluencerId is falsy, returning early');
+      return;
+    }
+    try {
+      const data = await getAds();
+      console.log('Ads fetched:', data);
+      setAds(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Failed to fetch ads:', error);
+      setAds([]);
+    }
+  };
+
+  // Handlers
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
+    const files = (e.target as HTMLInputElement).files;
+
+    if (name === 'platforms') {
+      setFormData(prev => ({
+        ...prev,
+        platforms: checked
+          ? [...prev.platforms, value]
+          : prev.platforms.filter(p => p !== value)
+      }));
+    } else if (type === 'file' && files) {
+      setFormData(prev => ({ ...prev, image: files[0] }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleSendExistingAd = async (adId: string) => {
+    if (!selectedInfluencerId) return;
+    try {
+      await sendRequestToInfluencer({
+        influencerId: selectedInfluencerId,
+        adId,
+        campaignData: null
+      });
+      setToastMessage('Request sent successfully!');
+      setShowToast(true);
+      closeModal();
+      setTimeout(() => setShowToast(false), 3000);
+    } catch (error) {
+      console.error('Failed to send request:', error);
+      setToastMessage('Failed to send request. Please try again.');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedInfluencerId) return;
+    try {
+      await sendRequestToInfluencer({
+        influencerId: selectedInfluencerId,
+        adId: null,
+        campaignData: formData
+      });
+      setToastMessage('Request sent successfully!');
+      setShowToast(true);
+      closeModal();
+      setTimeout(() => setShowToast(false), 3000);
+    } catch (error) {
+      console.error('Failed to send request:', error);
+      setToastMessage('Failed to send request. Please try again.');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    }
+  };
+
+  // Modal Functions
+  const openModal = (influencerId: string) => {
+    setSelectedInfluencerId(influencerId);
+    setModalView('options');
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setModalView('options');
+    setSelectedInfluencerId(null);
+    setFormData({
+      campaignName: '',
+      platforms: [],
+      startDate: '',
+      endDate: '',
+      taskCount: '',
+      barterOrPaid: 'barter',
+      budget: '',
+      requirements: '',
+      campaignDescription: '',
+      image: null,
+    });
+  };
+
+  // Filter Functions
+  const filteredInfluencers = influencers.filter(influencer => {
+    const name = influencer.personalInfo?.name || '';
+    const location = `${influencer.personalInfo?.city || ''} ${influencer.personalInfo?.state || ''}`.trim();
+    const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      location.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesNiche = selectedNiche === 'all' || influencer.personalInfo?.niche === selectedNiche;
+    return matchesSearch && matchesNiche;
+  });
+
+  const uniqueNiches = ['all', ...new Set(influencers.map(inf => inf.personalInfo?.niche))];
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 p-6">
+      {/* Header Section */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <h1 className="text-2xl font-bold text-slate-900">Available Influencers</h1>
-        <Button onClick={togglePopup}>Send Request</Button>
+        
+        
+        {/* Search and Filter Section */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search influencers..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:border-indigo-500 
+                focus:ring-1 focus:ring-indigo-500 outline-none transition-all duration-200"
+            />
+          </div>
+          
+          <div className="relative">
+            <Filter className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <select
+              value={selectedNiche}
+              onChange={(e) => setSelectedNiche(e.target.value)}
+              className="pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:border-indigo-500 
+                focus:ring-1 focus:ring-indigo-500 outline-none transition-all duration-200 appearance-none bg-white"
+            >
+              {uniqueNiches.map(niche => (
+                <option key={niche} value={niche}>
+                  {(niche ? niche.charAt(0).toUpperCase() + niche.slice(1) : '')}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
 
       {/* Influencers Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {influencers.map((influencer) => (
-          <Card key={influencer.id} className="overflow-hidden">
-            <div className="flex flex-col items-center p-6 text-center">
-              <img
-                src={influencer.image}
-                alt={influencer.name}
-                className="mb-4 h-24 w-24 rounded-full object-cover"
-              />
-              <h3 className="mb-1 text-lg font-semibold text-slate-900">{influencer.name}</h3>
-              <p className="mb-1 text-sm text-slate-600">{influencer.location}</p>
-              <p className="mb-2 text-sm text-slate-600">{influencer.followers} followers</p>
-              <p className="mb-4 text-sm text-slate-600">Niche: {influencer.niche}</p>
-              <Button onClick={togglePopup} icon={<UserPlus size={16} />}>
-                Send Request
-              </Button>
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      {/* Popup Form */}
-      {isPopupOpen && (
+      {isLoading ? (
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+        </div>
+      ) : (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
-          <Card className="w-full max-w-lg p-6 relative">
-            <button
-              onClick={togglePopup}
-              className="absolute right-4 top-4 rounded-full p-2 text-slate-600 hover:bg-slate-100"
-            >
-              <X size={20} />
-            </button>
-            <h2 className="mb-4 text-xl font-semibold text-slate-900">Send Request</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <Input
-                label="Campaign Name"
-                name="campaignName"
-                value={formData.campaignName}
-                onChange={handleInputChange}
-                required
-              />
-              <fieldset>
-                <legend className="mb-2 font-medium text-slate-700">Platform(s)</legend>
-                <div className="flex flex-wrap gap-3">
-                  {['Instagram', 'Facebook', 'TikTok', 'YouTube'].map((platform) => (
-                    <label key={platform} className="inline-flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        name="platforms"
-                        value={platform}
-                        checked={formData.platforms.includes(platform)}
-                        onChange={handleInputChange}
-                      />
-                      <span>{platform}</span>
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
-              <div className="flex space-x-4">
-                <Input
-                  label="Start Date"
-                  name="startDate"
-                  type="date"
-                  value={formData.startDate}
-                  onChange={handleInputChange}
-                  required
-                />
-                <Input
-                  label="End Date"
-                  name="endDate"
-                  type="date"
-                  value={formData.endDate}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <Input
-                label="Task (No. of posts/stories)"
-                name="taskCount"
-                type="number"
-                value={formData.taskCount}
-                onChange={handleInputChange}
-                required
-              />
-              <fieldset>
-                <legend className="mb-2 font-medium text-slate-700">Barter or Paid</legend>
-                <label className="inline-flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    name="barterOrPaid"
-                    value="barter"
-                    checked={formData.barterOrPaid === 'barter'}
-                    onChange={handleInputChange}
-                  />
-                  <span>Barter</span>
-                </label>
-                <label className="inline-flex items-center space-x-2 ml-6">
-                  <input
-                    type="radio"
-                    name="barterOrPaid"
-                    value="paid"
-                    checked={formData.barterOrPaid === 'paid'}
-                    onChange={handleInputChange}
-                  />
-                  <span>Paid</span>
-                </label>
-              </fieldset>
-              {formData.barterOrPaid === 'paid' && (
-                <Input
-                  label="Budget"
-                  name="budget"
-                  type="number"
-                  value={formData.budget}
-                  onChange={handleInputChange}
-                  required
-                />
-              )}
-              <Input
-                label="Requirements (followers, niche)"
-                name="requirements"
-                value={formData.requirements}
-                onChange={handleInputChange}
-              />
-              <div className="flex justify-end">
-                <Button type="submit" variant="primary">
-                  Submit
-                </Button>
-                <Button type="button" variant="outline" onClick={togglePopup} className="ml-2">
-                  Cancel
-                </Button>
-              </div>
-            </form>
-          </Card>
+          {filteredInfluencers.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              <p className="text-slate-600">No influencers found matching your criteria.</p>
+            </div>
+          ) : (
+filteredInfluencers.map((influencer) => (
+  <motion.div key={influencer._id} variants={itemVariants}>
+          <InfluencerProfileCard
+          profileImageUrl={
+            influencer.instagramInsights?.profile_picture_url || ''
+          }
+        fullName={
+          influencer.personalInfo?.name || ''
+        }
+          city={influencer.personalInfo?.city || ''}
+          state={influencer.personalInfo?.state || ''}
+          followers={
+            influencer.instagramInsights?.followers_count?.toLocaleString() || '0'
+          }
+          niche={influencer.personalInfo?.niche || ''}
+          instagramReach={
+            influencer.instagramInsights?.insights?.find(i => i.name === 'reach')?.values[0]?.value || 0
+          }
+          gender={influencer.personalInfo?.gender || ''}
+          instagramUsername={influencer.instagramInsights?.username || ''}
+          onSendRequest={() => openModal(influencer._id || '')}
+    />
+  </motion.div>
+))
+          )}
         </motion.div>
       )}
+
+      {/* Modal */}
+      <AvailableInfluencerModal
+        isModalOpen={isModalOpen}
+        modalView={modalView}
+        ads={ads}
+        formData={formData}
+        closeModal={closeModal}
+        setModalView={setModalView}
+        handleSendExistingAd={handleSendExistingAd}
+        handleSubmit={handleSubmit}
+        handleInputChange={handleInputChange}
+      />
+
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {showToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-4 right-4 bg-green-100 text-green-800 px-6 py-3 rounded-lg shadow-lg"
+          >
+            {toastMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

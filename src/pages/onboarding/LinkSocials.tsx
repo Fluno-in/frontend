@@ -4,7 +4,7 @@ import { Instagram, Facebook, Twitter, Youtube, ExternalLink, CheckCircle } from
 import Container from '../../components/ui/Container';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
-import { fetchLinkedSocials } from '../../services/linkSocialsApi';
+import { fetchLinkedSocials } from '../../services/authServices/linkSocialsApi';
 import { getToken } from '../../utils/auth';
 
 interface SocialPlatform {
@@ -16,7 +16,7 @@ interface SocialPlatform {
 }
 
 import { useNavigate } from 'react-router-dom';
-import { getCurrentUser } from '../../services/authApi';
+import { getCurrentUser } from '../../services/authServices/authApi';
 
 const LinkSocials = () => {
   const [platforms, setPlatforms] = useState<SocialPlatform[]>([
@@ -118,10 +118,9 @@ const LinkSocials = () => {
       window.history.replaceState({}, document.title, url.toString());
     }
   }, []);
-
   const handleConnect = async (platformId: string) => {
     if (platformId === 'instagram') {
-      const backendUrl = import.meta.env.VITE_API_BASE_URL || 'https://happy-hairs-design.loca.lt';
+      const backendUrl = import.meta.env.VITE_API_BASE_URL || 'https://public-otters-enjoy.loca.lt';
 
       const token = getToken();
       console.log('Instagram OAuth login token:', token);
@@ -157,7 +156,7 @@ const LinkSocials = () => {
           <Card padding="lg" className="mx-auto">
             <div className="mb-8">
               <div className="h-2 w-full rounded-full bg-slate-200">
-                <div className="h-2 w-2/3 rounded-full bg-primary-500"></div>
+                <div className="h-2 w-2/2 rounded-full bg-primary-500"></div>
               </div>
               <p className="mt-2 text-center text-sm text-slate-600">Step 2 of 2</p>
             </div>

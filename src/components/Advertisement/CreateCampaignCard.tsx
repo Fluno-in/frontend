@@ -42,13 +42,13 @@ const CreateCampaignCard: React.FC<CreateCampaignCardProps> = ({
 }) => {
   return (
     <Card className="w-full max-w-lg rounded-2xl p-6 relative bg-white">
-      <button
+      {/* <button
         onClick={togglePopup}
         className="absolute right-4 top-4 rounded-full p-2 text-slate-600 hover:bg-slate-100 transition-colors"
       >
         <X size={20} />
       </button>
-      <h2 className="mb-4 text-xl font-semibold text-slate-900">Create New Campaign</h2>
+      <h2 className="mb-4 text-xl font-semibold text-slate-900">Create New Campaign</h2> */}
       <form
         onSubmit={handleSubmit}
         className="space-y-6 max-h-[80vh] overflow-y-auto pr-2 custom-scrollbar"
@@ -182,15 +182,19 @@ const CreateCampaignCard: React.FC<CreateCampaignCardProps> = ({
           placeholder="e.g., Minimum followers, specific niche, content guidelines"
         />
 
-        <Input
-          type="textarea"
-          label="Campaign Description"
-          name="campaignDescription"
-          value={formData.campaignDescription}
-          onChange={handleInputChange}
-          icon={<Users size={18} className="text-slate-400" />}
-          placeholder="Looking for food and lifestyle influencers to promote our new summer menu and outdoor seating area."
-        />
+        <div className="space-y-1">
+  <label htmlFor="campaignDescription" className="text-slate-700 font-medium">Campaign Description</label>
+  <textarea
+    id="campaignDescription"
+    name="campaignDescription"
+    value={formData.campaignDescription}
+    onChange={handleInputChange}
+    placeholder="Looking for food and lifestyle influencers..."
+    className="w-full p-3 border border-slate-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary-500"
+    rows={4}
+  />
+</div>
+
 
         <div className="flex justify-end space-x-3 pt-4 border-t">
           <Button type="button" variant="outline" onClick={togglePopup}>

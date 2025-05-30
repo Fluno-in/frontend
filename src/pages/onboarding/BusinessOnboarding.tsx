@@ -5,7 +5,7 @@ import Container from '../../components/ui/Container';
 import Card from '../../components/ui/Card';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import { upsertBusinessOnboarding , getBusinessOnboarding} from '../../services/onboardingApi';
+import { upsertBusinessOnboarding , getBusinessOnboarding} from '../../services/OnboardingData/onboardingApi';
 
 const BusinessOnboarding = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -127,9 +127,9 @@ const BusinessOnboarding = () => {
                 <h2 className="text-xl font-bold text-primary-700">Suzao</h2>
               </div>
               <div className="h-2 w-full rounded-full bg-slate-200">
-                <div className="h-2 w-1/3 rounded-full bg-primary-500"></div>
+                <div className="h-2 w-1/2 rounded-full bg-primary-500"></div>
               </div>
-              <p className="mt-2 text-center text-sm text-slate-600">Step 1 of 3</p>
+              <p className="mt-2 text-center text-sm text-slate-600">Step 1 of 2</p>
             </div>
 
             <h1 className="mb-6 text-center text-2xl font-bold text-slate-900">

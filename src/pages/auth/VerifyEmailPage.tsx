@@ -5,7 +5,7 @@ import { Mail, ArrowRight } from 'lucide-react';
 import Container from '../../components/ui/Container';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
-import { resendOtp } from '../../services/verifyOtpApi';
+import { resendOtp } from '../../services/authServices/verifyOtpApi';
 
 const VerifyEmailPage = () => {
   const location = useLocation();

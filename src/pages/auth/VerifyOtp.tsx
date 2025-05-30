@@ -5,7 +5,7 @@ import { CheckCircle } from 'lucide-react';
 import Container from '../../components/ui/Container';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
-import { verifyOtp, resendOtp } from '../../services/verifyOtpApi';
+import { verifyOtp, resendOtp } from '../../services/authServices/verifyOtpApi';
 
 const VerifyOtp = () => {
   const location = useLocation();

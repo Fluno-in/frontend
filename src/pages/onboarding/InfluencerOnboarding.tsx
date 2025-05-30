@@ -7,7 +7,7 @@ import Card from '../../components/ui/Card';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import "react-datepicker/dist/react-datepicker.css";
-import { getInfluencerOnboarding, upsertInfluencerOnboarding } from '../../services/onboardingApi';
+import { getInfluencerOnboarding, upsertInfluencerOnboarding } from '../../services/OnboardingData/onboardingApi';
 
 const InfluencerOnboarding = () => {
   const [formData, setFormData] = useState({
@@ -137,9 +137,9 @@ const InfluencerOnboarding = () => {
             {/* Progress Bar */}
             <div className="mb-8">
               <div className="h-2 w-full rounded-full bg-slate-200">
-                <div className="h-2 w-1/3 rounded-full bg-primary-500"></div>
+                <div className="h-2 w-1/2 rounded-full bg-primary-500"></div>
               </div>
-              <p className="mt-2 text-center text-sm text-slate-600">Step 1 of 3</p>
+              <p className="mt-2 text-center text-sm text-slate-600">Step 1 of 2</p>
             </div>
 
             <h1 className="mb-6 text-center text-2xl font-bold text-slate-900">

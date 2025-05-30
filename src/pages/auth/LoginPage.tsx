@@ -5,9 +5,9 @@ import { Mail, Lock, ArrowRight } from 'lucide-react';
 import Container from '../../components/ui/Container';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import { login } from '../../services/signupLoginApi';
+import { login } from '../../services/authServices/signupLoginApi';
 import { setToken } from '../../utils/auth';
-import { getCurrentUser } from '../../services/authApi';
+import { getCurrentUser } from '../../services/authServices/authApi';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
