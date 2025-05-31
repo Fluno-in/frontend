@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const ProtectedRoute = () => {
+const ProtectedRoute = ({ allowedRoles }) => {
   const { user, loading } = useAuth();
 
   console.log('ProtectedRoute: loading:', loading, 'user:', user);
@@ -18,6 +18,12 @@ const ProtectedRoute = () => {
   if (!user) {
     console.log('ProtectedRoute: No user, redirecting to /login');
     return <Navigate to="/login" replace />;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(user.type)) {
+    console.log(`ProtectedRoute: User role '${user.type}' not allowed, redirecting to correct dashboard`);
+    const redirectPath = user.type === 'influencer' ? '/dashboard/influencer' : '/dashboard/business';
+    return <Navigate to={redirectPath} replace />;
   }
 
   return <Outlet />;

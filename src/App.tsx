@@ -78,8 +78,8 @@ function AppContent() {
         <Route path="onboarding/linksocials" element={<LinkSocials />} />
       </Route>
 
-       {/* Influencer Dashboard Routes */}
-      <Route element={<ProtectedRoute />}>
+      {/* Influencer Dashboard Routes */}
+      <Route element={<ProtectedRoute allowedRoles={['influencer']} />}>
         <Route path="dashboard/influencer" element={<InfluencerDashboardLayout />}>
           <Route index element={<InfluencerOverview />} />
           <Route path='overview' element={< InfluencerOverview />} />
@@ -91,7 +91,7 @@ function AppContent() {
       </Route>
 
       {/* Business Dashboard Routes */}
-      <Route element={<ProtectedRoute />}>
+      <Route element={<ProtectedRoute allowedRoles={['business']} />}>
         <Route path="dashboard/business" element={<BusinessDashboardLayout />}>
           <Route index element={<BusinessOverview />} />
           <Route path='overview' element={< BusinessOverview/>} />
