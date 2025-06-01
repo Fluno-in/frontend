@@ -11,18 +11,6 @@ export interface Ad {
   requirements?: string;
   image?: string;
   campaignDescription?: string;
+  hasApplied?: boolean;
+  appliedInfluencers?: string[];
 }
-
-export interface FetchAvailableAdsResponse {
-  success: boolean;
-  ads: Ad[];
-}
-
-export interface ApiResponse {
-  success: boolean;
-  message?: string;
-}
-
-export function fetchAvailableAds(): Promise<FetchAvailableAdsResponse>;
-export function applyForAd(adId: string): Promise<ApiResponse>;
-export function markAdNotInterested(adId: string): Promise<ApiResponse>;

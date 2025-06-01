@@ -75,9 +75,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = (token: string, userData: User, rememberMe: boolean) => {
-    if (rememberMe) {
-      setToken(token);
-    }
+    setToken(token, rememberMe);
     setUser(userData);
   };
 
