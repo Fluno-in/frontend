@@ -4,15 +4,14 @@ import { getToken } from '../../utils/auth';
 const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 const API_BASE_URL = `${baseUrl}/api/requestAds`;
 
-
 // Fetch influencer ad data by influencer ID
 export const getInfluencerAds = async (influencerId) => {
   try {
     const token = getToken();
-    const response = await axios.get(`${API_BASE_URL}/influencer/${influencerId}`,{
+    const response = await axios.get(`${API_BASE_URL}/influencer/${influencerId}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
-        }
+      },
     });
     return response.data;
   } catch (error) {
@@ -25,15 +24,25 @@ export const getInfluencerAds = async (influencerId) => {
 export const sendRequestToInfluencer = async ({ influencerId, adId, campaignData }) => {
   try {
     const token = getToken();
-    const response = await axios.post(`${API_BASE_URL}/sendRequest`, {
-      influencerId,
-      adId,
-      campaignData,
-      }, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          }
-    });
+    const isFormData = campaignData instanceof FormData;
+
+    // Prepare request body
+    const data = isFormData
+      ? campaignData
+      : {
+          influencerId,
+          adId,
+          campaignData,
+        };
+
+    // Set headers
+    const headers = {
+      'Authorization': `Bearer ${token}`,
+      ...(isFormData && { 'Content-Type': 'multipart/form-data' }),
+    };
+
+    // Send POST request
+    const response = await axios.post(`${API_BASE_URL}/sendRequest`, data, { headers });
     return response.data;
   } catch (error) {
     console.error('Error sending request to influencer:', error);

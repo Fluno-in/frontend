@@ -1,18 +1,20 @@
-import React from 'react';
-import { X, Plus, Calendar, Hash, DollarSign, Users, MessageSquare} from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Plus, Calendar, Hash, DollarSign, Users, MessageSquare, Loader } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 
 const platformsOptions = [
-  { name: 'Instagram', icon: <Instagram size={20} /> },
-  { name: 'Facebook', icon: <Facebook size={20} /> },
-  { name: 'Twitter', icon: <Twitter size={20} /> },
-  { name: 'YouTube', icon: <Youtube size={20} /> }
+  { name: 'Instagram', icon: <Instagram size={20} />, disabled: false },
+  { name: 'Facebook', icon: <Facebook size={20} />, disabled: true },
+  { name: 'Twitter', icon: <Twitter size={20} />, disabled: true },
+  { name: 'YouTube', icon: <Youtube size={20} />, disabled: true }
 ];
 
 // To avoid duplicate icons import, we will import the needed icons here
 import { Instagram, Facebook, Youtube, Twitter } from 'lucide-react';
+
 
 interface CreateCampaignCardProps {
   formData: {
@@ -24,7 +26,10 @@ interface CreateCampaignCardProps {
     barterOrPaid: string;
     budget: string;
     requirements: string;
-    image?: File | null;
+    image?: {
+    url: string;
+    public_id: string;
+    } | null;
     campaignDescription: string;
   };
   handleInputChange: (
@@ -32,6 +37,7 @@ interface CreateCampaignCardProps {
   ) => void;
   handleSubmit: (e: React.FormEvent) => void;
   togglePopup: () => void;
+  loading?: boolean;
 }
 
 const CreateCampaignCard: React.FC<CreateCampaignCardProps> = ({
@@ -39,7 +45,33 @@ const CreateCampaignCard: React.FC<CreateCampaignCardProps> = ({
   handleInputChange,
   handleSubmit,
   togglePopup,
+  loading = false,
 }) => {
+  const [toastMessage, setToastMessage] = useState('');
+  const [showToast, setShowToast] = useState(false);
+
+  const showToastMessage = (message: string) => {
+    setToastMessage(message);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
+
+  const handlePlatformClick = (platform: { name: string; disabled: boolean }) => {
+    if (platform.disabled) {
+      showToastMessage('Coming soon');
+    }
+  };
+
+  const onPlatformChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const platformName = e.target.value;
+    const platform = platformsOptions.find(p => p.name === platformName);
+    if (platform?.disabled) {
+      showToastMessage('Coming soon');
+      return;
+    }
+    handleInputChange(e);
+  };
+
   return (
     <Card className="w-full max-w-lg rounded-2xl p-6 relative bg-white">
       {/* <button
@@ -83,19 +115,21 @@ const CreateCampaignCard: React.FC<CreateCampaignCardProps> = ({
             {platformsOptions.map((platform) => (
               <label
                 key={platform.name}
+                onClick={() => handlePlatformClick(platform)}
                 className={`flex items-center space-x-3 p-3 rounded-xl border transition-colors cursor-pointer ${
                   formData.platforms.includes(platform.name)
                     ? 'border-primary-500 bg-primary-50 text-primary-700'
                     : 'border-slate-200 hover:border-slate-300'
-                }`}
+                } ${platform.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <input
                   type="checkbox"
                   name="platforms"
                   value={platform.name}
                   checked={formData.platforms.includes(platform.name)}
-                  onChange={handleInputChange}
+                  onChange={onPlatformChange}
                   className="sr-only"
+                  disabled={platform.disabled}
                 />
                 {platform.icon}
                 <span>{platform.name}</span>
@@ -183,28 +217,40 @@ const CreateCampaignCard: React.FC<CreateCampaignCardProps> = ({
         />
 
         <div className="space-y-1">
-  <label htmlFor="campaignDescription" className="text-slate-700 font-medium">Campaign Description</label>
-  <textarea
-    id="campaignDescription"
-    name="campaignDescription"
-    value={formData.campaignDescription}
-    onChange={handleInputChange}
-    placeholder="Looking for food and lifestyle influencers..."
-    className="w-full p-3 border border-slate-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary-500"
-    rows={4}
-  />
-</div>
-
+          <label htmlFor="campaignDescription" className="text-slate-700 font-medium">Campaign Description</label>
+          <textarea
+            id="campaignDescription"
+            name="campaignDescription"
+            value={formData.campaignDescription}
+            onChange={handleInputChange}
+            placeholder="Looking for food and lifestyle influencers..."
+            className="w-full p-3 border border-slate-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary-500"
+            rows={4}
+          />
+        </div>
 
         <div className="flex justify-end space-x-3 pt-4 border-t">
-          <Button type="button" variant="outline" onClick={togglePopup}>
+          <Button type="button" variant="outline" onClick={togglePopup} disabled={loading}>
             Cancel
           </Button>
-          <Button type="submit" variant="primary">
-            Create Campaign
+          <Button type="submit" variant="primary" disabled={loading} className="flex items-center justify-center space-x-2">
+            {loading && <Loader className="animate-spin h-5 w-5 text-white" />}
+            <span>{loading ? 'Creating...' : 'Create Campaign'}</span>
           </Button>
         </div>
       </form>
+      <AnimatePresence>
+        {showToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-4 right-4 bg-green-100 text-green-800 px-6 py-3 rounded-lg shadow-lg"
+          >
+            {toastMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Card>
   );
 };

@@ -174,7 +174,7 @@ const InfluencerAds = () => {
                 <div className="relative h-52">
                   {ad.image ? (
                     <img
-                      src={ad.image}
+                      src={ad.image?.url}
                       alt={ad.campaignName}
                       className="h-full w-full object-cover rounded-t-lg"
                     />

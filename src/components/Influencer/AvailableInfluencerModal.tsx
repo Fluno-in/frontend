@@ -14,7 +14,10 @@ interface FormData {
   budget: string;
   requirements: string;
   campaignDescription: string;
-  image: File | null;
+  image: {
+    url: string;
+    public_id: string;
+  } | null;
 }
 
 interface AvailableInfluencerModalProps {
@@ -22,6 +25,7 @@ interface AvailableInfluencerModalProps {
   modalView: 'options' | 'postedAds' | 'createCampaign';
   ads: any[];
   formData: FormData;
+  loading?: boolean;
   closeModal: () => void;
   setModalView: (view: 'options' | 'postedAds' | 'createCampaign') => void;
   handleSendExistingAd: (adId: string) => Promise<void>;
@@ -36,6 +40,7 @@ const AvailableInfluencerModal = ({
   modalView,
   ads = [],
   formData,
+  loading = false,
   closeModal,
   setModalView,
   handleSendExistingAd,
@@ -55,7 +60,7 @@ const AvailableInfluencerModal = ({
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="w-full max-w-lg max-h-[90vh] overflow-auto bg-white rounded-xl shadow-xl"
+            className="w-full max-w-lg overflow-hidden bg-white rounded-xl shadow-xl"
           >
             {/* Modal Header */}
             <div className="relative border-b border-slate-200">
@@ -135,6 +140,7 @@ const AvailableInfluencerModal = ({
                     handleInputChange={handleInputChange}
                     handleSubmit={handleSubmit}
                     togglePopup={closeModal}
+                    loading={loading}
                   />
                 </div>
               )}

@@ -4,13 +4,12 @@ import { UserPlus, Search, Filter } from 'lucide-react';
 
 // Components
 import InfluencerProfileCard from '../../../components/Influencer/InfluencerProfileCard';
+import AvailableInfluencerModal from '../../../components/Influencer/AvailableInfluencerModal';
 
 // Services
 import { getAds } from '../../../services/businessDashboard/postAds';
 import { getAvailableInfluencers } from '../../../services/businessDashboard/availableInfluencers';
 import { sendRequestToInfluencer } from '../../../services/businessDashboard/requestAds';
-import AvailableInfluencerModal from '../../../components/dashboard/AvailableInfluencerModal';
-
 
 interface Influencer {
   _id: string;
@@ -41,7 +40,11 @@ interface FormData {
   budget: string;
   requirements: string;
   campaignDescription: string;
-  image: File | null;
+  image?: {
+    url: string;
+    public_id: string;
+  } | null;
+  file?: File | null;
 }
 
 const AvailableInfluencers = () => {
@@ -58,6 +61,8 @@ const AvailableInfluencers = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [formData, setFormData] = useState<FormData>({
     campaignName: '',
     platforms: [],
@@ -69,6 +74,7 @@ const AvailableInfluencers = () => {
     requirements: '',
     campaignDescription: '',
     image: null,
+    file: null,
   });
 
   // Animation variants
@@ -133,14 +139,11 @@ const AvailableInfluencers = () => {
   };
 
   const fetchAds = async () => {
-    console.log('fetchAds called with selectedInfluencerId:', selectedInfluencerId);
     if (!selectedInfluencerId) {
-      console.log('selectedInfluencerId is falsy, returning early');
       return;
     }
     try {
       const data = await getAds();
-      console.log('Ads fetched:', data);
       setAds(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to fetch ads:', error);
@@ -163,8 +166,12 @@ const AvailableInfluencers = () => {
           ? [...prev.platforms, value]
           : prev.platforms.filter(p => p !== value)
       }));
-    } else if (type === 'file' && files) {
-      setFormData(prev => ({ ...prev, image: files[0] }));
+    } else if (type === 'file' && files && files.length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        image: null, // clear previous image preview
+        file: files[0],
+      }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
@@ -194,19 +201,37 @@ const AvailableInfluencers = () => {
     e.preventDefault();
     if (!selectedInfluencerId) return;
     try {
+      setIsSubmitting(true);
+      const formPayload = new FormData();
+      formPayload.append('influencerId', selectedInfluencerId);
+      formPayload.append('adId', ''); // no adId when creating new campaign
+
+      // Append campaignData as JSON string
+      const campaignData = { ...formData };
+      delete campaignData.file; // remove file from campaignData
+      formPayload.append('campaignData', JSON.stringify(campaignData));
+
+      // Append image file if exists
+      if (formData.file) {
+        formPayload.append('image', formData.file);
+      }
+
       await sendRequestToInfluencer({
         influencerId: selectedInfluencerId,
-        adId: null,
-        campaignData: formData
+        adId: '',
+        campaignData: formPayload,
       });
+
       setToastMessage('Request sent successfully!');
       setShowToast(true);
       closeModal();
+      setIsSubmitting(false);
       setTimeout(() => setShowToast(false), 3000);
     } catch (error) {
       console.error('Failed to send request:', error);
       setToastMessage('Failed to send request. Please try again.');
       setShowToast(true);
+      setIsSubmitting(false);
       setTimeout(() => setShowToast(false), 3000);
     }
   };
@@ -219,6 +244,7 @@ const AvailableInfluencers = () => {
   };
 
   const closeModal = () => {
+    setIsSubmitting(false);
     setIsModalOpen(false);
     setModalView('options');
     setSelectedInfluencerId(null);
@@ -233,6 +259,7 @@ const AvailableInfluencers = () => {
       requirements: '',
       campaignDescription: '',
       image: null,
+      file: null,
     });
   };
 
@@ -338,6 +365,7 @@ filteredInfluencers.map((influencer) => (
         modalView={modalView}
         ads={ads}
         formData={formData}
+        loading={isSubmitting}
         closeModal={closeModal}
         setModalView={setModalView}
         handleSendExistingAd={handleSendExistingAd}

@@ -12,7 +12,10 @@ interface AdCardProps {
     barterOrPaid: string;
     budget?: number;
     requirements?: string;
-    image?: string;
+    image?: {
+      url: string;
+      public_id: string;
+    };
     campaignDescription?: string;
   };
   onDelete?: (id: string) => void;
@@ -103,7 +106,7 @@ const AdCard: React.FC<AdCardProps> = ({ ad, onDelete }) => {
       {/* {ad.image ? ( */}
         <div className="relative w-full overflow-hidden" style={{ paddingTop: '56.25%' }}>
           <img
-            src={ad.image}
+            src={ad.image?.url || ''}
             alt={ad.campaignName}
             className="absolute top-0 left-0 w-full h-full object-cover 
               transition-transform duration-500 group-hover:scale-105"

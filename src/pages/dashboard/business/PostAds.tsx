@@ -9,6 +9,7 @@ import AdCard from '../../../components/Advertisement/AdCard';
 const PostAds = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     campaignName: '',
     platforms: [] as string[],
@@ -19,7 +20,8 @@ const PostAds = () => {
     budget: '',
     requirements: '',
     campaignDescription: '',
-    image: null as File | null,
+    image: null as { url: string; public_id: string } | null,
+    file: null as File | null,
   });
   const [ads, setAds] = useState<any[]>([]);
 
@@ -28,15 +30,15 @@ const PostAds = () => {
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const { name, value, checked, files } = e.target as HTMLInputElement;
+    const { name, value, checked, files, type } = e.target as HTMLInputElement;
 
     if (name === 'platforms') {
       const updatedPlatforms = checked
         ? [...formData.platforms, value]
         : formData.platforms.filter((p) => p !== value);
       setFormData({ ...formData, platforms: updatedPlatforms });
-    } else if (name === 'image' && files) {
-      setFormData({ ...formData, image: files[0] });
+    } else if (type === 'file' && files && files.length > 0) {
+      setFormData({ ...formData, image: { url: URL.createObjectURL(files[0]), public_id: '' }, file: files[0] });
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -74,9 +76,24 @@ const PostAds = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     try {
+      const data = new FormData();
+      data.append('campaignName', formData.campaignName);
+      data.append('platforms', JSON.stringify(formData.platforms));
+      data.append('startDate', formData.startDate);
+      data.append('endDate', formData.endDate);
+      data.append('taskCount', formData.taskCount);
+      data.append('barterOrPaid', formData.barterOrPaid);
+      data.append('budget', formData.budget);
+      data.append('requirements', formData.requirements);
+      data.append('campaignDescription', formData.campaignDescription);
+      if (formData.file) {
+        data.append('image', formData.file);
+      }
+
       // @ts-ignore
-      await postAd(formData);
+      await postAd(data);
       togglePopup();
       setFormData({
         campaignName: '',
@@ -89,12 +106,15 @@ const PostAds = () => {
         requirements: '',
         campaignDescription: '',
         image: null,
+        file: null,
       });
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3000);
       fetchAds();
     } catch (error) {
       console.error('Failed to post ad:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -135,6 +155,7 @@ const PostAds = () => {
                 handleInputChange={handleInputChange}
                 handleSubmit={handleSubmit}
                 togglePopup={togglePopup}
+                loading={loading}
               />
             </motion.div>
           </motion.div>
