@@ -21,6 +21,7 @@ import InfluencerDashboardLayout from './components/layout/InfluencerDashboardLa
 import InfluencerOverview from './pages/dashboard/influencer/influencerOverview';
 import InfluencerAds from './pages/dashboard/influencer/Ads';
 import InfluencerRequests from './pages/dashboard/influencer/Requests';
+import TrackCampaignInfluencer from './pages/dashboard/influencer/TrackCampaignInfluencer';
 import InfluencerProfile from './pages/dashboard/influencer/influencerProfile';
 import InfluencerHelp from './pages/dashboard/shared/HelpAndSupport';
 
@@ -85,6 +86,7 @@ function AppContent() {
           <Route path='overview' element={< InfluencerOverview />} />
           <Route path="ads" element={<InfluencerAds />} />
           <Route path="requests" element={<InfluencerRequests />} />
+          <Route path="track-campaign" element={<TrackCampaignInfluencer />} />
           <Route path="profile" element={<InfluencerProfile />} />
           <Route path="help" element={<InfluencerHelp />} />
         </Route>
