@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
@@ -14,6 +15,8 @@ interface InfluencerProfileCardProps {
   gender?: string;
   instagramUsername?: string;
   onSendRequest?: () => void;
+  requestStatus?: string | null;
+  onTrackAds?: () => void;
 }
 
 const InfluencerProfileCard: React.FC<InfluencerProfileCardProps> = ({
@@ -27,6 +30,8 @@ const InfluencerProfileCard: React.FC<InfluencerProfileCardProps> = ({
   gender,
   instagramUsername,
   onSendRequest,
+  requestStatus,
+  onTrackAds,
 }) => {
   const location = [city, state].filter(Boolean).join(', ');
 
@@ -84,17 +89,39 @@ const InfluencerProfileCard: React.FC<InfluencerProfileCardProps> = ({
         )}
       </div>
 
-      {/* Send Request Button */}
-      <Button
-        variant="primary"
-        size="md"
-        onClick={onSendRequest}
-        className="px-6 py-2 flex items-center space-x-2"
-        icon={<UserPlus size={20} />}
-        iconPosition="left"
-      >
-        Send Request
-      </Button>
+      {/* Request Button */}
+      {requestStatus === 'pending' ? (
+        <Button
+          variant="secondary"
+          size="md"
+          disabled
+          className="px-6 py-2 flex items-center space-x-2 cursor-not-allowed"
+          icon={<UserPlus size={20} />}
+          iconPosition="left"
+        >
+          Requested
+        </Button>
+      ) : requestStatus === 'accepted' ? (
+        <Button
+          variant="primary"
+          size="md"
+          onClick={onTrackAds}
+          className="px-6 py-2 flex items-center space-x-2"
+        >
+          Track Ads
+        </Button>
+      ) : (
+        <Button
+          variant="primary"
+          size="md"
+          onClick={onSendRequest}
+          className="px-6 py-2 flex items-center space-x-2"
+          icon={<UserPlus size={20} />}
+          iconPosition="left"
+        >
+          Send Request
+        </Button>
+      )}
     </Card>
   );
 };

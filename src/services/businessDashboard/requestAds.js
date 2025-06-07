@@ -49,3 +49,19 @@ export const sendRequestToInfluencer = async ({ influencerId, adId, campaignData
     throw error;
   }
 };
+
+// Get request status for a business user and influencer
+export const getRequestStatus = async (influencerId) => {
+  try {
+    const token = getToken();
+    const response = await axios.get(`${API_BASE_URL}/status/${influencerId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    return response.data.status; // status can be null, 'pending', 'accepted', etc.
+  } catch (error) {
+    console.error('Error fetching request status:', error);
+    throw error;
+  }
+};

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UserPlus, Search, Filter } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 // Components
 import InfluencerProfileCard from '../../../components/Influencer/InfluencerProfileCard';
@@ -9,7 +10,7 @@ import AvailableInfluencerModal from '../../../components/Influencer/AvailableIn
 // Services
 import { getAds } from '../../../services/businessDashboard/postAds';
 import { getAvailableInfluencers } from '../../../services/businessDashboard/availableInfluencers';
-import { sendRequestToInfluencer } from '../../../services/businessDashboard/requestAds';
+import { sendRequestToInfluencer, getRequestStatus } from '../../../services/businessDashboard/requestAds';
 
 interface Influencer {
   _id: string;
@@ -48,6 +49,8 @@ interface FormData {
 }
 
 const AvailableInfluencers = () => {
+  const navigate = useNavigate();
+
   // State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalView, setModalView] = useState<'options' | 'postedAds' | 'createCampaign'>('options');
@@ -76,6 +79,9 @@ const AvailableInfluencers = () => {
     image: null,
     file: null,
   });
+
+  // New state to track request statuses per influencer
+  const [requestStatuses, setRequestStatuses] = useState<Record<string, string | null>>({});
 
   // Animation variants
   const containerVariants = {
@@ -126,6 +132,20 @@ const AvailableInfluencers = () => {
           },
         }));
         setInfluencers(mappedInfluencers);
+
+        // Fetch request status for each influencer
+        const statuses: Record<string, string | null> = {};
+        await Promise.all(
+          mappedInfluencers.map(async (inf) => {
+            try {
+              const status = await getRequestStatus(inf._id);
+              statuses[inf._id] = status;
+            } catch (error) {
+              statuses[inf._id] = null;
+            }
+          })
+        );
+        setRequestStatuses(statuses);
       } else {
         console.error('Expected influencers data to be an array but got:', data);
         setInfluencers([]);
@@ -189,6 +209,12 @@ const AvailableInfluencers = () => {
       setShowToast(true);
       closeModal();
       setTimeout(() => setShowToast(false), 3000);
+
+      // Update request status to pending after sending request
+      setRequestStatuses(prev => ({
+        ...prev,
+        [selectedInfluencerId]: 'pending',
+      }));
     } catch (error) {
       console.error('Failed to send request:', error);
       setToastMessage('Failed to send request. Please try again.');
@@ -227,6 +253,12 @@ const AvailableInfluencers = () => {
       closeModal();
       setIsSubmitting(false);
       setTimeout(() => setShowToast(false), 3000);
+
+      // Update request status to pending after sending request
+      setRequestStatuses(prev => ({
+        ...prev,
+        [selectedInfluencerId]: 'pending',
+      }));
     } catch (error) {
       console.error('Failed to send request:', error);
       setToastMessage('Failed to send request. Please try again.');
@@ -261,6 +293,11 @@ const AvailableInfluencers = () => {
       image: null,
       file: null,
     });
+  };
+
+  // Handler for Track Ads button click
+  const handleTrackAds = (influencerId: string) => {
+    navigate(`/dashboard/business/track-campaign/${influencerId}`);
   };
 
   // Filter Functions
@@ -331,30 +368,35 @@ const AvailableInfluencers = () => {
               <p className="text-slate-600">No influencers found matching your criteria.</p>
             </div>
           ) : (
-filteredInfluencers.map((influencer) => (
-  <motion.div key={influencer._id} variants={itemVariants}>
-          <InfluencerProfileCard
-          profileImageUrl={
-            influencer.instagramInsights?.profile_picture_url || ''
-          }
-          fullName={
-            influencer.personalInfo?.fullName || ''
-          }
-          city={influencer.personalInfo?.city || ''}
-          state={influencer.personalInfo?.state || ''}
-          followers={
-            influencer.instagramInsights?.followers_count?.toLocaleString() || '0'
-          }
-          niche={influencer.personalInfo?.niche || ''}
-          instagramReach={
-            influencer.instagramInsights?.insights?.find(i => i.name === 'reach')?.values[0]?.value || 0
-          }
-          gender={influencer.personalInfo?.gender || ''}
-          instagramUsername={influencer.instagramInsights?.username || ''}
-          onSendRequest={() => openModal(influencer._id || '')}
-    />
-  </motion.div>
-))
+            filteredInfluencers.map((influencer) => {
+              const status = requestStatuses[influencer._id];
+              return (
+                <motion.div key={influencer._id} variants={itemVariants} className="relative">
+                  <InfluencerProfileCard
+                    profileImageUrl={
+                      influencer.instagramInsights?.profile_picture_url || ''
+                    }
+                    fullName={
+                      influencer.personalInfo?.fullName || ''
+                    }
+                    city={influencer.personalInfo?.city || ''}
+                    state={influencer.personalInfo?.state || ''}
+                    followers={
+                      influencer.instagramInsights?.followers_count?.toLocaleString() || '0'
+                    }
+                    niche={influencer.personalInfo?.niche || ''}
+                    instagramReach={
+                      influencer.instagramInsights?.insights?.find(i => i.name === 'reach')?.values[0]?.value || 0
+                    }
+                    gender={influencer.personalInfo?.gender || ''}
+                    instagramUsername={influencer.instagramInsights?.username || ''}
+                    onSendRequest={() => openModal(influencer._id || '')}
+                    requestStatus={status}
+                    onTrackAds={() => handleTrackAds(influencer._id)}
+                  />
+                </motion.div>
+              );
+            })
           )}
         </motion.div>
       )}
