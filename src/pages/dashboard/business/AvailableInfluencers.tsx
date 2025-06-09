@@ -10,7 +10,7 @@ import AvailableInfluencerModal from '../../../components/Influencer/AvailableIn
 // Services
 import { getAds } from '../../../services/businessDashboard/postAds';
 import { getAvailableInfluencers } from '../../../services/businessDashboard/availableInfluencers';
-import { sendRequestToInfluencer, getRequestStatus } from '../../../services/businessDashboard/requestAds';
+import { getRequestStatus, getAcceptedAdsPerInfluencer , sendRequestToInfluencer} from '../../../services/businessDashboard/requestAds';
 
 interface Influencer {
   _id: string;
@@ -41,7 +41,7 @@ interface FormData {
   budget: string;
   requirements: string;
   campaignDescription: string;
-  image?: {
+  image: {
     url: string;
     public_id: string;
   } | null;
@@ -82,6 +82,8 @@ const AvailableInfluencers = () => {
 
   // New state to track request statuses per influencer
   const [requestStatuses, setRequestStatuses] = useState<Record<string, string | null>>({});
+  // New state to track accepted campaign ad IDs per influencer
+  const [acceptedAdIds, setAcceptedAdIds] = useState<Record<string, string>>({});
 
   // Animation variants
   const containerVariants = {
@@ -135,6 +137,10 @@ const AvailableInfluencers = () => {
 
         // Fetch request status for each influencer
         const statuses: Record<string, string | null> = {};
+        // Fetch accepted ad IDs per influencer from new API
+        const adIds: Record<string, string> = await getAcceptedAdsPerInfluencer();
+        console.log('Accepted Ad IDs:', adIds);
+
         await Promise.all(
           mappedInfluencers.map(async (inf) => {
             try {
@@ -146,6 +152,7 @@ const AvailableInfluencers = () => {
           })
         );
         setRequestStatuses(statuses);
+        setAcceptedAdIds(adIds);
       } else {
         console.error('Expected influencers data to be an array but got:', data);
         setInfluencers([]);
@@ -158,45 +165,18 @@ const AvailableInfluencers = () => {
     }
   };
 
-  const fetchAds = async () => {
-    if (!selectedInfluencerId) {
-      return;
-    }
+  // New function to refresh acceptedAdIds
+  const refreshAcceptedAdIds = async () => {
     try {
-      const data = await getAds();
-      setAds(Array.isArray(data) ? data : []);
+      const adIds: Record<string, string> = await getAcceptedAdsPerInfluencer();
+      setAcceptedAdIds(adIds);
+      console.log('Refreshed Accepted Ad IDs:', adIds);
     } catch (error) {
-      console.error('Failed to fetch ads:', error);
-      setAds([]);
+      console.error('Failed to refresh accepted ad IDs:', error);
     }
   };
-
-  // Handlers
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value, type } = e.target;
-    const checked = (e.target as HTMLInputElement).checked;
-    const files = (e.target as HTMLInputElement).files;
-
-    if (name === 'platforms') {
-      setFormData(prev => ({
-        ...prev,
-        platforms: checked
-          ? [...prev.platforms, value]
-          : prev.platforms.filter(p => p !== value)
-      }));
-    } else if (type === 'file' && files && files.length > 0) {
-      setFormData(prev => ({
-        ...prev,
-        image: null, // clear previous image preview
-        file: files[0],
-      }));
-    } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
-    }
-  };
-
+  
+  // Handler for sending existing ad to influencer
   const handleSendExistingAd = async (adId: string) => {
     if (!selectedInfluencerId) return;
     try {
@@ -215,6 +195,9 @@ const AvailableInfluencers = () => {
         ...prev,
         [selectedInfluencerId]: 'pending',
       }));
+
+      // Refresh acceptedAdIds after sending request
+      await refreshAcceptedAdIds();
     } catch (error) {
       console.error('Failed to send request:', error);
       setToastMessage('Failed to send request. Please try again.');
@@ -259,6 +242,9 @@ const AvailableInfluencers = () => {
         ...prev,
         [selectedInfluencerId]: 'pending',
       }));
+
+      // Refresh acceptedAdIds after sending request
+      await refreshAcceptedAdIds();
     } catch (error) {
       console.error('Failed to send request:', error);
       setToastMessage('Failed to send request. Please try again.');
@@ -267,6 +253,45 @@ const AvailableInfluencers = () => {
       setTimeout(() => setShowToast(false), 3000);
     }
   };
+
+  const fetchAds = async () => {
+    if (!selectedInfluencerId) {
+      return;
+    }
+    try {
+      const data = await getAds();
+      setAds(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Failed to fetch ads:', error);
+      setAds([]);
+    }
+  };
+
+// Handlers
+const handleInputChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+) => {
+  const { name, value, type } = e.target;
+  const checked = (e.target as HTMLInputElement).checked;
+  const files = (e.target as HTMLInputElement).files;
+
+  if (name === 'platforms') {
+    setFormData(prev => ({
+      ...prev,
+      platforms: checked
+        ? [...prev.platforms, value]
+        : prev.platforms.filter(p => p !== value)
+    }));
+  } else if (type === 'file' && files && files.length > 0) {
+    setFormData(prev => ({
+      ...prev,
+      image: null, // clear previous image preview
+      file: files[0],
+    }));
+  } else {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  }
+};
 
   // Modal Functions
   const openModal = (influencerId: string) => {
@@ -296,8 +321,8 @@ const AvailableInfluencers = () => {
   };
 
   // Handler for Track Ads button click
-  const handleTrackAds = (influencerId: string) => {
-    navigate(`/dashboard/business/track-campaign/${influencerId}`);
+  const handleTrackAds = (adId: string) => {
+    navigate(`/dashboard/business/track-campaign/${adId}`);
   };
 
   // Filter Functions
@@ -392,7 +417,7 @@ const AvailableInfluencers = () => {
                     instagramUsername={influencer.instagramInsights?.username || ''}
                     onSendRequest={() => openModal(influencer._id || '')}
                     requestStatus={status}
-                    onTrackAds={() => handleTrackAds(influencer._id)}
+                    onTrackAds={() => handleTrackAds(acceptedAdIds[influencer._id] || '')}
                   />
                 </motion.div>
               );

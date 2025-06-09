@@ -127,7 +127,7 @@ const InfluencerRequests = () => {
                           </Button>
                           <Button
                             variant="outline"
-                            onClick={() => navigate('/dashboard/influencer/track-campaign')}
+                            onClick={() => navigate(`/dashboard/influencer/track-campaign/${request.ad._id}`)}
                           >
                             Track Ads
                           </Button>

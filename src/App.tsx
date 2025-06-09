@@ -33,6 +33,7 @@ import BusinessApplications from './pages/dashboard/business/Applications';
 import BusinessInfluencers from './pages/dashboard/business/AvailableInfluencers';
 import BusinessProfile from './pages/dashboard/business/businessProfile';
 import BusinessHelp from './pages/dashboard/shared/HelpAndSupport';
+import TrackCampaignBusiness from './pages/dashboard/business/TrackCampaignBusiness';
 
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './utils/ProtectedRoute';
@@ -86,7 +87,7 @@ function AppContent() {
           <Route path='overview' element={< InfluencerOverview />} />
           <Route path="ads" element={<InfluencerAds />} />
           <Route path="requests" element={<InfluencerRequests />} />
-          <Route path="track-campaign" element={<TrackCampaignInfluencer />} />
+          <Route path="track-campaign/:adId" element={<TrackCampaignInfluencer />} />
           <Route path="profile" element={<InfluencerProfile />} />
           <Route path="help" element={<InfluencerHelp />} />
         </Route>
@@ -102,6 +103,7 @@ function AppContent() {
           <Route path="influencers" element={<BusinessInfluencers />} />
           <Route path="profile" element={<BusinessProfile />} />
           <Route path="help" element={<BusinessHelp />} />
+          <Route path="track-campaign/:adId" element={<TrackCampaignBusiness />} />
         </Route>
       </Route>
     </Routes>
