@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, Settings, LogOut, ChevronDown } from 'lucide-react';
+import { useAuth } from '../../../context/AuthContext';
 
 interface DashboardTopbarProps {
   userType: 'influencer' | 'business';
@@ -10,6 +11,7 @@ interface DashboardTopbarProps {
 const DashboardTopbar: React.FC<DashboardTopbarProps> = ({ userType }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const { logout } = useAuth();
 
   const notifications = [
     {
@@ -117,7 +119,10 @@ const DashboardTopbar: React.FC<DashboardTopbarProps> = ({ userType }) => {
                   <Settings size={16} />
                   <span>Settings</span>
                 </Link>
-                <button className="flex w-full items-center space-x-2 rounded-lg px-3 py-2 text-sm text-red-600 hover:bg-red-50">
+                <button
+                  onClick={logout}
+                  className="flex w-full items-center space-x-2 rounded-lg px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+                >
                   <LogOut size={16} />
                   <span>Log out</span>
                 </button>
