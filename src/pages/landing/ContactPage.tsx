@@ -6,6 +6,8 @@ import Card from '../../components/ui/Card';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 
+import { sendContactForm } from '../../services/contactAPI';
+
 const ContactPage = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -47,29 +49,31 @@ const ContactPage = () => {
     return newErrors;
   };
   
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const formErrors = validateForm();
     setErrors(formErrors);
-    
+
     if (Object.keys(formErrors).length === 0) {
       setIsSubmitting(true);
-      
-      // Simulate form submission
-      setTimeout(() => {
-        console.log('Form submitted:', formData);
-        setIsSubmitting(false);
-        setIsSubmitted(true);
-        
-        // Reset form after submission
-        setFormData({
-          name: '',
-          email: '',
-          subject: '',
-          message: '',
+
+      sendContactForm(formData)
+        .then(() => {
+          setIsSubmitting(false);
+          setIsSubmitted(true);
+          setFormData({
+            name: '',
+            email: '',
+            subject: '',
+            message: '',
+          });
+        })
+        .catch((error) => {
+          setIsSubmitting(false);
+          setErrors({ form: error.message || 'Failed to send message' });
         });
-      }, 1500);
     }
   };
 
@@ -106,8 +110,8 @@ const ContactPage = () => {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-slate-900">Email</p>
-                      <a href="mailto:hello@suzao.com" className="text-sm text-slate-600 hover:text-primary-600">
-                        hello@suzao.com
+                      <a href="mailto:help.fluno@gmail.com" className="text-sm text-slate-600 hover:text-primary-600">
+                        help.fluno@gmail.com
                       </a>
                     </div>
                   </div>
@@ -118,8 +122,8 @@ const ContactPage = () => {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-slate-900">Phone</p>
-                      <a href="tel:+1-800-123-4567" className="text-sm text-slate-600 hover:text-primary-600">
-                        +1 (800) 123-4567
+                      <a href="tel:+916202988337" className="text-sm text-slate-600 hover:text-primary-600">
+                        +91 6202988337
                       </a>
                     </div>
                   </div>
@@ -131,9 +135,9 @@ const ContactPage = () => {
                     <div>
                       <p className="text-sm font-medium text-slate-900">Office</p>
                       <p className="text-sm text-slate-600">
-                        123 Innovation Drive<br />
-                        San Francisco, CA 94103<br />
-                        United States
+                         AIC, MUJ<br />
+                        Jaipur, Rajasthan<br />
+                       India
                       </p>
                     </div>
                   </div>
