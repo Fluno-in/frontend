@@ -1,6 +1,10 @@
 import { Routes, Route, Navigate  } from 'react-router-dom';
+
+//layouts
 import MainLayout from './components/layout/MainLayout';
 import AuthLayout from './components/layout/AuthLayout';
+
+// Landing Pages
 import Home from './pages/landing/Home';
 import AboutPage from './pages/landing/AboutPage';
 import ContactPage from './pages/landing/ContactPage';
@@ -8,7 +12,11 @@ import FeaturesPage from './pages/landing/FeaturesPage';
 import PrivacyPolicyPage from './pages/landing/PrivacyPolicyPage';
 import TermsPage from './pages/landing/TermsPage';
 import CookiePolicyPage from './pages/landing/CookiePolicyPage';
+
+// Authentication Pages
 import LoginPage from './pages/auth/LoginPage';
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
+import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import SignupPage from './pages/auth/SignupPage';
 import VerifyEmailPage from './pages/auth/VerifyEmailPage';
 import VerifyOtp from './pages/auth/VerifyOtp';
@@ -72,6 +80,8 @@ function AppContent() {
       </Route>
       <Route element={<AuthLayout />}>
         <Route path="login" element={<LoginPage />} />
+        <Route path="forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="reset-password" element={<ResetPasswordPage />} />
         <Route path="signup" element={<SignupPage />} />
         <Route path="verify-email" element={<VerifyEmailPage />} />
         <Route path="verify-otp" element={<VerifyOtp />} />
