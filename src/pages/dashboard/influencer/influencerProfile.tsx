@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Camera, Save, User, Mail, Lock, Bell, CreditCard, Shield } from 'lucide-react';
 import Card from '../../../components/ui/Card';
-import Button from '../../../components/ui/Button';
-import Input from '../../../components/ui/Input';
 import PersonalInfo from '../../../components/profile/PersonalInfo';
 import LinkedAccounts from '../../../components/profile/LinkedAccounts';
 import Security from '../../../components/profile/Security';
@@ -11,11 +9,13 @@ import Notifications from '../../../components/profile/Notifications';
 import Billing from '../../../components/profile/Billing';
 import Privacy from '../../../components/profile/Privacy';
 import { getPersonalInfo, upsertPersonalInfo } from '../../../services/influencerDashboard/personalInfo';
+import { fetchProfileImage } from '../../../services/sharedDashboard/topbar';
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState('profile');
   const [personalInfoData, setPersonalInfoData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: <User size={16} /> },
@@ -37,7 +37,12 @@ const Profile = () => {
         setLoading(false);
       }
     };
+    const loadProfileImage = async () => {
+      const url = await fetchProfileImage();
+      setProfileImageUrl(url);
+    };
     fetchPersonalInfo();
+    loadProfileImage();
   }, []);
 
   const handleSave = async (updatedData) => {
@@ -71,18 +76,18 @@ const Profile = () => {
           <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6">
             <div className="relative mb-4 h-24 w-24 overflow-hidden rounded-full sm:mb-0">
               <img
-                src="https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-                alt="Profile"
-                className="h-full w-full object-cover"
-              />
-              <button className="absolute bottom-0 right-0 rounded-full bg-primary-600 p-1.5 text-white shadow-md hover:bg-primary-700">
+              src={profileImageUrl || 'https://cdn-icons-png.flaticon.com/512/7915/7915522.png'}
+              alt="Profile"
+              className="h-24 w-24 rounded-full object-cover"
+            />
+              {/* <button className="absolute bottom-0 right-0 rounded-full bg-primary-600 p-1.5 text-white shadow-md hover:bg-primary-700">
                 <Camera size={16} />
-              </button>
+              </button> */}
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-slate-900">{personalInfoData?.fullName || 'Alex Morgan'}</h2>
+              <h2 className="text-xl font-semibold text-slate-900">{personalInfoData?.fullName || 'Hi! user'}</h2>
               <p className="text-slate-600">Influencer Account · Premium Plan</p>
-              <p className="mt-1 text-sm text-slate-500">Member since March 2025</p>
+              {/* <p className="mt-1 text-sm text-slate-500">Member since March 2025</p> */}
             </div>
           </div>
         </Card>

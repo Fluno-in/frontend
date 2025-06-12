@@ -20,7 +20,7 @@ interface InfluencerProfileCardProps {
 }
 
 const InfluencerProfileCard: React.FC<InfluencerProfileCardProps> = ({
-  profileImageUrl = 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=400&q=80', // Fashion boutique rack placeholder
+  profileImageUrl = 'https://cdn-icons-png.flaticon.com/512/7915/7915522.png', // Fashion boutique rack placeholder
   fullName,
   city,
   state,

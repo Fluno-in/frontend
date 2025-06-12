@@ -23,8 +23,8 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
     { icon: <FileText size={20} />, label: 'Post Ads', path: '/dashboard/business/post-ads' },
     { icon: <ClipboardList size={20} />, label: 'Applications', path: '/dashboard/business/applications' },
     { icon: <Users size={20} />, label: 'Influencers', path: '/dashboard/business/influencers' },
-    { icon: <HelpCircle size={20} />, label: 'Help', path: '/dashboard/business/help' },
     { icon: <User size={20} />, label: 'Profile', path: '/dashboard/business/profile' },
+    { icon: <HelpCircle size={20} />, label: 'Help', path: '/dashboard/business/help' },
   ];
 
   const sidebarVariants = {
