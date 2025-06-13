@@ -5,15 +5,15 @@ const TermsPage = () => {
   const sections = [
     {
       title: "1. Agreement to Terms",
-      content: "By accessing or using the Suzao platform, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this site."
+      content: "By accessing or using the Localyse platform, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this site."
     },
     {
       title: "2. Use License",
-      content: "Permission is granted to temporarily use the Suzao platform for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:",
+      content: "Permission is granted to temporarily use the Localyse platform for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:",
       listItems: [
         "Modify or copy the materials",
         "Use the materials for any commercial purpose or for any public display",
-        "Attempt to reverse engineer any software contained on the Suzao platform",
+        "Attempt to reverse engineer any software contained on the Localyse platform",
         "Remove any copyright or other proprietary notations from the materials",
         "Transfer the materials to another person or 'mirror' the materials on any other server"
       ]
@@ -32,7 +32,7 @@ const TermsPage = () => {
     },
     {
       title: "6. Intellectual Property",
-      content: "The Suzao platform and its original content, features, and functionality are and will remain the exclusive property of Suzao and its licensors. The platform is protected by copyright, trademark, and other laws of both the United States and foreign countries. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of Suzao."
+      content: "The Localyse platform and its original content, features, and functionality are and will remain the exclusive property of Localyse and its licensors. The platform is protected by copyright, trademark, and other laws of both the United States and foreign countries. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of Localyse."
     },
     {
       title: "7. Termination",
@@ -40,7 +40,7 @@ const TermsPage = () => {
     },
     {
       title: "8. Limitation of Liability",
-      content: "In no event shall Suzao, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the platform."
+      content: "In no event shall Localyse, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the platform."
     },
     {
       title: "9. Disclaimer",
@@ -56,7 +56,7 @@ const TermsPage = () => {
     },
     {
       title: "12. Contact Us",
-      content: "If you have any questions about these Terms, please contact us at legal@suzao.com."
+      content: "If you have any questions about these Terms, please contact us at legal@localyse.com."
     }
   ];
 
@@ -94,12 +94,12 @@ const TermsPage = () => {
           
           <div className="mt-8 text-center text-sm text-slate-500">
             <p>
-              By using the Suzao platform, you acknowledge that you have read and understood these Terms of Service and agree to be bound by them.
+              By using the Localyse platform, you acknowledge that you have read and understood these Terms of Service and agree to be bound by them.
             </p>
             <p className="mt-2">
               For any questions, please contact us at{' '}
-              <a href="mailto:legal@suzao.com" className="text-primary-600 hover:underline">
-                legal@suzao.com
+              <a href="mailto:legal@localyse.com" className="text-primary-600 hover:underline">
+                legal@localyse.com
               </a>
             </p>
           </div>

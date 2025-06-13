@@ -37,7 +37,7 @@ const Footer = () => {
           {/* Logo and description */}
           <div className="lg:col-span-2">
             <Link to="/" className="text-xl font-bold text-primary-700">
-              Suzao
+              Localyse
             </Link>
             <p className="mt-4 max-w-md text-sm text-slate-600">
               Empowering local businesses with authentic, influencer-driven marketing. 
@@ -68,7 +68,7 @@ const Footer = () => {
         <div className="mt-12 border-t border-slate-200 pt-6">
           <div className="flex flex-col items-center justify-between space-y-4 sm:flex-row sm:space-y-0">
             <p className="text-sm text-slate-600">
-              © {currentYear} Suzao. All rights reserved.
+              © {currentYear} Localyse. All rights reserved.
             </p>
             <div className="flex space-x-6">
               {/* Social links would go here */}
